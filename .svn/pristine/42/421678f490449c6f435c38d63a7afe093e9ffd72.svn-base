@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>地图</title>
+	<style type="text/css">
+		/* html {
+			height: 85%
+		}
+
+		body {
+			height: 100%;
+			margin: 0px;
+			padding: 0px
+		} */
+
+		#container {
+			height: 100%
+		}
+	</style>
+	<link rel="stylesheet" href="../../css/layui.css">
+	<link rel="stylesheet" href="css/map.css">
+	<script type="text/javascript" src="../../js/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript" src="../../js/layui.js"></script>
+	<script type="text/javascript"
+		src="https://webapi.amap.com/maps?v=1.4.14&key=9e5874d828f9b34a11abc264bf1342a0&plugin=AMap.PolyEditor"></script>
+	<script type="text/javascript" src="js/mapUtil.js"></script>
+	<script type="text/javascript" src="js/amap.js"></script>
+</head>
+
+<body>
+	<div id="container"></div>
+	<div class="input-card" style="width: 100px">
+		<button class="btn" id="openEdit" style="margin-bottom: 5px">启用编辑</button> 
+		<button class="btn" id="closeEdit">结束编辑</button> 
+		<div class="input-item">
+			<input type="checkbox" id="realTimeData" onclick="refreshData(this)">实时数据
+		</div>
+	 </div>
+</body>
+
+</html>

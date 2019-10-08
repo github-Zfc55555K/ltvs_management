@@ -1,0 +1,36 @@
+
+html{
+    height: 100%;
+    width: 100%;
+}
+body{
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    user-select: none;
+    background-color: white;
+    font-family:"Times New Roman", Times, serif;
+    text-indent:5px;
+}
+.login-container{
+    width:100%; 
+    height: 100%;
+}
+.login-title{
+    font-size: 25px;
+    line-height: 65px;
+    text-indent:5px;
+}
+.login-content{
+    width: 100%;
+    height: 85%;
+    background-image: url('../img/lognbg_nw.jpg');
+}
+footer{
+    font-family:"Times New Roman", Times, serif;
+    text-align: center;
+    font-size: 15px;
+    line-height: 65px;
+    text-indent:5px
+}
+

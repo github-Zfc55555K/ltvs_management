@@ -1,0 +1,209 @@
+/**
+ * 使用高德地图
+ */
+
+var _AMAP = null; // 高德地图全局变量
+
+$(document).ready(function () {
+  init();
+});
+
+var layer = null;
+layui.use('layer', function () {
+  layer = layui.layer;
+});
+var init = function () {
+  //初始化地图
+  _AMAP = new AMap.Map("container", {
+    resizeEnable: true,
+    pitchEnable: true,
+    zoom: 14,
+    pitch: 20,
+    rotation: -15,
+    viewMode: '3D',
+    expandZoomRange: true,
+    zooms: [3, 20],
+    showIndoorMap: false,
+    center: [113.276008, 23.200389],
+    mapStyle: 'amap://styles/light'
+
+  });
+  //加载地图 插件
+  _AMAP.plugin(['AMap.ControlBar', 'AMap.Scale', 'AMap.PolyEditor'], function () {//增加插件
+    var controlBar = new AMap.ControlBar();
+    var scale = new AMap.Scale({
+      visible: true,
+      bottom: 100
+    });
+    _AMAP.addControl(controlBar);
+    _AMAP.addControl(scale);
+  });
+
+  //地图工具类
+  var mapUtil = new MapUtil();
+  //查询数据
+  var list = mapUtil.queryNode('/ltvs_management/getTransformerInfo', {});
+  //信息窗体
+  var infoWindow = new AMap.InfoWindow({ offset: new AMap.Pixel(0, -30) });
+  //点击事件函数
+  var markerClick = function markerClick(e) {
+    infoWindow.setContent(e.target.content);
+    infoWindow.open(_AMAP, e.target.getPosition());
+  }
+  //初始化地图上加载点
+  for (var i = 0, marker; i < list.length; i++) {
+    var marker = new AMap.Marker({
+      position: [list[i].gpsjd, list[i].gpswd],
+      map: _AMAP,
+      icon: mapUtil.getMarkImg(list[i].hierarchy)
+    });
+    marker.content = list[i].bdzbh + ' ' + list[i].bdzmc;
+    marker.on('click', markerClick);
+    // marker.emit('click', { target: marker });
+  }
+
+
+  //查询第一层的折线
+  var lineList = mapUtil.queryNode('/ltvs_management/getLineByLev', { lev: 1 });
+  for (var i = 0; i < lineList.length; i++) {
+    var p = mapUtil.splitPath(lineList[i].linepath);
+    // var p = [[113.271373, 23.181994],[113.271133, 23.167231],[113.305544, 23.177731]];
+    var polyline = new AMap.Polyline({
+      path: p,
+      isOutline: true,
+      outlineColor: '#ffeeff',
+      borderWeight: 3,
+      strokeColor: "#3366FF",
+      strokeOpacity: 1,
+      strokeWeight: 6,
+      strokeStyle: "solid",
+      strokeDasharray: [10, 5],
+      lineJoin: 'round',
+      lineCap: 'round',
+      zIndex: 50,
+    });
+    polyline.setMap(_AMAP);
+  }
+
+    //根据点的分布 自适应
+    _AMAP.setFitView();
+
+  var flag = 1;//已经显示的层级标志 防止重复加载数据
+  //根据 缩放 自动加载数据
+  (function () {
+    _AMAP.on('zoomchange', function () {
+      var _zoom = _AMAP.getZoom();
+      if (_zoom >= 16 && _zoom < 18) {
+        if (flag < 2) {
+          console.log('当前地图缩放倍数:' + _AMAP.getZoom() + '开始加载第二层数据');
+          var jboxList = mapUtil.queryNode('/ltvs_management/getjboxinfo', {});
+          for (var i = 0, marker; i < jboxList.length; i++) {
+            var marker = new AMap.Marker({
+              position: [jboxList[i].gpsjd, jboxList[i].gpswd],
+              map: _AMAP,
+              icon: mapUtil.getMarkImg(jboxList[i].hierarchy)
+            });
+            marker.content = jboxList[i].fjxbs + ' ' + jboxList[i].fjxmc;
+            marker.on('click', markerClick);
+          }
+          flag++;
+        }
+      } else if (_zoom >= 18 && _zoom < 19) {
+        if (flag < 3) {
+          console.log('当前地图缩放倍数:' + _AMAP.getZoom() + '开始加载第三层数据');
+          var tqlist =  mapUtil.queryNode('/ltvs_management/gettqinfo');
+          for (var i = 0, marker; i < tqlist.length; i++) {
+            var marker = new AMap.Marker({
+              position: [tqlist[i].gpsjd, tqlist[i].gpswd],
+              map: _AMAP,
+              icon: mapUtil.getMarkImg(tqlist[i].hierarchy)
+            });
+            marker.content = '<a href="javascript:openWindow(' + JSON.stringify(tqlist[i]).replace(/\"/g, "'") + ');">' + tqlist[i].tqbh + ' ' + tqlist[i].tqmc + '</a>';
+            marker.on('click', markerClick);
+          }
+          flag++;
+        }
+      } else if (_zoom >= 19) {
+        if (flag < 4) {
+          console.log('当前地图缩放倍数:' + _AMAP.getZoom() + '开始加载第四层数据');
+          // mapUtil.queryNode();
+          flag++;
+        }
+      }
+    });
+  })();
+
+  _AMAP.on('click', findJW);
+}
+//设置折线的起始点 并生成折线
+var polyEditor = null; //折线编辑类
+var polyline = null; // 折线
+var editBool = true;//设置编辑状态标志 true 为结束编辑
+var openEdit = function () {
+  if (!editBool) {
+    layer.msg('error 当前状态下不可重复编辑', {
+      time: 1500
+    });
+    return;
+  }
+  //设置折线初始路径
+  var path = [[_AMAP.getCenter().lng, _AMAP.getCenter().lat], [_AMAP.getCenter().lng, _AMAP.getCenter().lat]];
+  polyline = new AMap.Polyline({
+    path: path,
+    isOutline: true,
+    outlineColor: '#ffeeff',
+    borderWeight: 2,
+    strokeColor: "#3366FF",
+    strokeOpacity: 1,
+    strokeWeight: 6,
+    // 折线样式还支持 'dashed'
+    strokeStyle: "dashed",
+    // strokeStyle是dashed时有效
+    strokeDasharray: [10, 5],
+    lineJoin: 'round',
+    lineCap: 'round',
+    zIndex: 50,
+  })
+  polyline.setMap(_AMAP);
+  polyEditor = new AMap.PolyEditor(_AMAP, polyline);
+  editBool = false;
+  polyEditor.open();
+}
+
+var closeEdit = function () {
+  if (editBool) {
+    layer.msg('erroer 请开始编辑', {
+      time: 1500
+    });
+    return;
+  }
+  var path = [];
+  var p = polyline.getPath();
+  for (var i = 0; i < p.length; i++) {
+    var pp = [];
+    pp.push(p[i].lng);
+    pp.push(p[i].lat);
+    path.push(pp);
+  }
+  layer.open({
+    type: 2,
+    area: ['450px', '300px'],
+    fixed: false, //不固定
+    content: '/ltvs_management/modules/mdmap/lineForm.html?path=' + path.toString() + '&zoom=' + _AMAP.getZoom()
+  });
+  polyEditor.close();
+  // layer.msg('保存成功', {
+  //   time: 1500
+  // });
+  editBool = true;
+}
+
+function openWindow(node) {
+	if (node.hasChild > 0) {
+		//是否有子集 判断是否跳转
+		self.location.href = "/ltvs_management/demo.html?id=" + node.tqmc;
+	}
+}
+var findJW = function (e) {
+  console.log('点击的坐标为:' + e.lnglat.getLng() + ',' + e.lnglat.getLat())
+}

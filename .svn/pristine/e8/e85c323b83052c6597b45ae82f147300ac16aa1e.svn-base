@@ -1,0 +1,331 @@
+/**
+ * 逻辑图
+ */
+/**
+ * 设置缩放
+ */
+window.onload = function () {
+    $solway.zoom({
+        ele: document.getElementById('container'),
+        scale: 1,
+        minScale: 0.1,
+        rate: 0.1
+    });
+    $solway.drag({
+        ele: document.getElementById('container')
+    });
+};
+//弹窗控件
+var layer = null;
+layui.use('layer', function () {
+    layer = layui.layer;
+});
+var getQueryString = function (name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return unescape(r[2]);
+    return null;
+}
+var MAX_WIDTH = 1500;
+var MAX_HEIGHT = 900;
+//svg 根元素
+var _SVG = SVG('container').size(1400, 800);
+//园
+var circle = _SVG.defs().circle(10).attr({
+    'fill-opacity': 0,
+    'stroke': '#000',
+    'stroke-width': 1.5
+});
+// 虚线框
+var rect = _SVG.defs().rect(450, 130).attr({
+    'fill-opacity': 0,
+    'stroke': '#000',
+    'stroke-width': 1.5,
+    'stroke-dasharray': "5"
+});
+
+//基本元素
+class Dsvg {
+    constructor() { }
+    //正方形
+    drawRect(x, y, w, h) {
+        _SVG.rect(w, h).attr({
+            'fill-opacity': 0,
+            'stroke': '#000',
+            'stroke-width': 1.5
+        }).move(x, y);
+    }
+
+    //直线段
+    drawLine(start1, end1, start2, end2, fn) {
+        var l = _SVG.line(start1, end1, start2, end2).attr({
+            'fill-opacity': 0,
+            'stroke': '#000',
+            'stroke-width': 1.5
+        }).style("cursor:pointer;");
+        if (typeof (fn) == "function") {
+            l.on('mouseover', fn);
+        }
+        return l.node.id;
+    }
+    // 带颜色线段
+    drawLineWithColor(start1, end1, start2, end2, color, fn) {
+        var l = _SVG.line(start1, end1, start2, end2).attr({
+            'fill-opacity': 0,
+            'stroke': color,
+            'stroke-width': 1.5
+        }).style("cursor:pointer;");
+        if (typeof (fn) == "function") {
+            l.on('mouseover', fn);
+        }
+        return l.node.id;;
+    }
+    //带底部文字的图片
+    drawImg(path, x, y, text, fn, type) {
+        var img = _SVG.image(path).loaded(function (loader) {
+            this.size(loader.width, loader.height);
+            (function () {
+                _SVG.text(text).attr({
+                    "font-weight": "normal",
+                    "font-family": "Helvetica, Arial, sans-serif",
+                    "font-size": 12
+                }).move(x, y + loader.height);
+            })();
+        }).move(x, y).style("cursor:pointer;");
+        if (type != null || type != undefined) {
+            if (typeof (fn) == "function") {
+                img.on(type, fn);
+            }
+        } else {
+            if (typeof (fn) == "function") {
+                img.on('mouseover', fn);
+            }
+        }
+
+        return img.node.id;
+    }
+    //文字 默认大小为12
+    drawText(x, y, text) {
+        _SVG.text(text).attr({
+            "font-weight": "normal",
+            "font-family": "Helvetica, Arial, sans-serif",
+            "font-size": 12
+        }).move(x, y);
+    }
+    //电站
+    drawStation(x, y, fn) {
+        var _x = parseInt(x);
+        var _y = parseInt(y);
+        var x2 = _x + 5;
+        var y2 = _y + 8;
+        var x3 = _x + 9;
+        var y3 = _y;
+        _SVG.use(circle).move(_x, _y);
+        _SVG.use(circle).move(x2, y2);
+        var c = _SVG.use(circle).move(x3, y3);
+        if (typeof (fn) == "function") {
+            c.on('mouseover', fn);
+        }
+        return c.node.id;
+    }
+}
+// 封装的元素
+class Lgsvg {
+    constructor() { }
+    //配电房
+    drawPowerRoom(x) {
+        var dsvg = new Dsvg();
+        var station = dsvg.drawStation(320, 152, () => {
+            layer.tips('1#主变', '#' + station, {
+                tips: [4, '#78BA32']
+            });
+        });
+        //竖方向主线
+        dsvg.drawLine(330, 69, 330, 80);
+        dsvg.drawLine(330, 95, 330, 200);
+        dsvg.drawLine(330, 215, 330, 240);
+        //开关
+        dsvg.drawLine(330, 215, 340, 200);
+        //开关
+        dsvg.drawLine(330, 95, 340, 80);
+
+        dsvg.drawLine(300, 105, 330, 105);
+        var gydb = dsvg.drawImg("img/gydianbiao.svg", 270, 89, "高压电表", () => {
+            layer.tips('高压电表', '#' + gydb, {
+                tips: [4, '#78BA32']
+            });
+        });
+
+        dsvg.drawLine(330, 130, 360, 130);
+        var zdid = dsvg.drawImg("img/zhongduan.svg", 360, 116, "负控终端", () => {
+            layer.tips('负控终端', '#' + zdid, {
+                tips: [4, '#78BA32']
+            });
+        });
+        //---------------------------------------------------------------
+        dsvg.drawLine(330, 240, 450, 240);
+        dsvg.drawLine(450, 240, 450, 270);
+        dsvg.drawLine(500, 240, 600, 240);
+        dsvg.drawLine(500, 240, 500, 270);
+        dsvg.drawLine(450, 270, 467, 270);
+        dsvg.drawLine(484, 270, 500, 270);
+        //开关
+        dsvg.drawLine(467, 270, 484, 260);
+        //----------------------------------------------------------------
+        var station2 = dsvg.drawStation(320 - 330 + 600, 152, () => {
+            layer.tips('2#主变', '#' + station2, {
+                tips: [4, '#78BA32']
+            });
+        });
+        //竖方向主线
+        dsvg.drawLine(330 - 330 + 600, 69, 330 - 330 + 600, 80);
+        dsvg.drawLine(330 - 330 + 600, 95, 330 - 330 + 600, 200);
+        dsvg.drawLine(330 - 330 + 600, 215, 330 - 330 + 600, 240);
+        //开关
+        dsvg.drawLine(330 - 330 + 600, 215, 340 - 330 + 600, 200);
+        //开关
+        dsvg.drawLine(330 - 330 + 600, 95, 340 - 330 + 600, 80);
+
+        dsvg.drawLine(300 - 330 + 600, 105, 330 - 330 + 600, 105);
+        var gydb2 = dsvg.drawImg("img/gydianbiao.svg", 270 - 330 + 600, 89, "高压电表", () => {
+            layer.tips('高压电表', '#' + gydb2, {
+                tips: [4, '#78BA32']
+            });
+        });
+
+        dsvg.drawLine(330 - 330 + 600, 130, 360 - 330 + 600, 130);
+        var zdid2 = dsvg.drawImg("img/zhongduan.svg", 360 - 330 + 600, 116, "负控终端", () => {
+            layer.tips('负控终端', '#' + zdid2, {
+                tips: [4, '#78BA32']
+            });
+        });
+
+
+    }
+    //小区
+    drawCommunity(x, length) {
+        var dsvg = new Dsvg();
+        var id = dsvg.drawImg("img/dianbiaoxiang.svg", 35 - 35 + x, 450, "电表箱", () => {
+            layer.tips('电表箱', '#' + id, {
+                tips: [4, '#78BA32']
+            });
+        });
+        dsvg.drawLineWithColor(50 - 35 + x, 310, 50 - 35 + x, 445, "#8B0000");
+        dsvg.drawLineWithColor(50 - 35 + x, 515, 50 - 35 + x, 750, "#8B0000");
+        dsvg.drawLineWithColor(60 - 35 + x, 320, 60 - 35 + x, 445, "#DAA520");
+        dsvg.drawLineWithColor(60 - 35 + x, 515, 60 - 35 + x, 750, "#DAA520");
+        dsvg.drawLineWithColor(70 - 35 + x, 330, 70 - 35 + x, 445, "#3CB371");
+        dsvg.drawLineWithColor(70 - 35 + x, 515, 70 - 35 + x, 750, "#3CB371");
+
+        dsvg.drawLineWithColor(90 - 35 + x, 460, 140 - 35 + x, 460, "#8B0000");
+        dsvg.drawLineWithColor(90 - 35 + x, 470, 140 - 35 + x, 470, "#DAA520");
+        dsvg.drawLineWithColor(90 - 35 + x, 480, 140 - 35 + x, 480, "#3CB371");
+        dsvg.drawLine(140 - 35 + x, 380, 140 - 35 + x, 720);
+
+        for (var i = 0; i < length; i++) {
+            var t = i - Math.floor(i / 10) * 10;
+            dsvg.drawLine(140 + (t * 50) - 35 + x, 390 + Math.floor(i / 10) * 85, 190 + (t * 50) - 35 + x, 390 + Math.floor(i / 10) * 85);
+            dsvg.drawLine(165 + (t * 50) - 35 + x, 390 + Math.floor(i / 10) * 85, 165 + (t * 50) - 35 + x, 415 + Math.floor(i / 10) * 85);
+            (function (i) {
+                var imgid = dsvg.drawImg("img/hu.svg", 150 + (t * 50) - 35 + x, 415 + Math.floor(i / 10) * 85, "XX户" + i, () => {
+                    layer.tips('XX户' + i, '#' + imgid, {
+                        tips: [1, '#78BA32']
+                    });
+                });
+            })(i);
+        }
+    }
+}
+var dataUtil = function () { }
+dataUtil.prototype.getAllXqInfo = function (url, obj) {
+
+}
+//初始化
+function init() {
+    //标题
+    _SVG.text("台区_逻辑图").attr({
+        "font-weight": "bold",
+        "font-family": "Helvetica, Arial, sans-serif",
+        "font-size": 16
+    }).move(20, 20);
+    //主干线路
+    var dsvg = new Dsvg();
+    var mainstation = dsvg.drawStation(100, 60, () => {
+        layer.tips('100KV/10KV变电站', '#' + mainstation, {
+            tips: [4, '#78BA32']
+        });
+    });
+    dsvg.drawLine(50, 69, 180, 69);
+    var ml = dsvg.drawLine(205, 69, 1200, 69, () => {
+        layer.tips('100kv/10kv', '#' + ml, {
+            tips: [1, '#000']
+        });
+    });
+    //开关
+    dsvg.drawLine(180, 69, 205, 55);
+
+}
+$(document).ready(function () {
+    init();
+    var dsvg = new Dsvg();
+    var lgsvg = new Lgsvg();
+    _SVG.use(rect).move(255, 225);
+    lgsvg.drawPowerRoom(320);
+    dsvg.drawLine(360, 240, 360, 275);
+    dsvg.drawLine(410, 240, 410, 275);
+    dsvg.drawRect(345, 275, 30, 70);
+    dsvg.drawText(352, 277, "补\n偿\n装\n置");
+    dsvg.drawRect(390, 275, 40, 70);
+    dsvg.drawText(395, 280, "监测\n计算\n终端");
+
+    dsvg.drawLine(360 + 170, 240, 360 + 170, 275);
+    dsvg.drawLine(410 + 170, 240, 410 + 170, 275);
+    dsvg.drawRect(345 + 170, 275, 30, 70);
+    dsvg.drawText(352 + 170, 277, "补\n偿\n装\n置");
+    dsvg.drawRect(390 + 170, 275, 40, 70);
+    dsvg.drawText(395 + 170, 280, "监测\n计算\n终端");
+
+
+    dsvg.drawLine(275, 240, 330, 240);
+    dsvg.drawLine(303, 240, 303, 275);
+    var pdx = dsvg.drawImg("img/peidianxiang.svg", 285, 275, "配电箱", () => {
+        layer.tips('配电箱', '#' + pdx, {
+            tips: [1, '#78BA32']
+        });
+    });
+
+    dsvg.drawLine(303, 325, 303, 365);
+
+
+
+    var xl = dsvg.drawLine(100, 365, 1000, 365, () => {
+        layer.tips('1号配电箱线路', '#' + xl, {
+            tips: [1, '#000']
+        });
+    });
+
+    // dsvg.drawLine(130, 365, 130, 400);
+    // dsvg.drawImg("img/dianbiaoxiang.svg", 105, 400, "1号电表箱", () => {
+    //     layer.open({
+    //         title: "小区详细信息",
+    //         type: 2,
+    //         content: '/ltvs_management/modules/mdlev/communityInfo.html',
+    //         area: ['1000px', '800px'],
+    //         maxmin: true
+    //     });
+    // }, "click");
+    for(var i = 0;i < 10;i++){
+        (function(i){
+            dsvg.drawLine(130+i*85, 365, 130+i*85, 400);
+            dsvg.drawImg("img/dianbiaoxiang.svg", 105+i*85, 400, i+"号电表箱", () => {
+                layer.open({
+                    title: "小区详细信息",
+                    type: 2,
+                    content: '/ltvs_management/modules/mdlev/communityInfo.html?param='+i,
+                    area: ['1000px', '800px'],
+                    maxmin: true
+                });
+            }, "click");
+        })(i);
+    }
+});

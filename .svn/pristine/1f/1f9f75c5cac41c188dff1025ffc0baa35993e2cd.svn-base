@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://xmlns.jcp.org/jsf/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery-1.11.1.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function(){
+            $("#ormdatasub").click(function(){
+                debugger
+                var formdata = new FormData($("#domeform")[0]);
+                $.ajax({
+                    url: "/secondsave",
+                    type: "POST",
+                    data:formdata,
+                    dataType: "json",
+                    processData: false,  // 告诉jQuery不要去处理发送的数据
+                    contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                    success: function (res) {
+                    }
+                })
+            })
+        })
+function checkFileExt(filename) {
+    var flag = false; //状态
+    var arr = ["svg","xml"];
+    //取出上传文件的扩展名
+    var index = filename.lastIndexOf(".");
+    var ext = filename.substr(index+1);
+    //循环比较
+    for(var i=0;i<arr.length;i++)
+    {
+        if(ext == arr[i])
+        {
+            flag = true; //一旦找到合适的，立即退出循环
+            break;
+        }
+    }
+    //条件判断
+    if(flag)
+    {
+        document.getElementById("ormdatasub").disabled=false;
+    }else
+    {
+        alert("请传入svg或xml格式文件!");
+        document.getElementById("ormdatasub").disabled=true;
+    }
+}
+    </script>
+</head>
+<body>
+
+<form action="/secondsave" id="domeform" method="post" enctype="multipart/form-data"/>
+    <input type="file" name="file" value="选择文件" onChange="checkFileExt(this.value)">
+    <input type="button" value="提交" id="ormdatasub">
+</from>
+</body>
+</html>

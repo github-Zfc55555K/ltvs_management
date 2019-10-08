@@ -1,0 +1,53 @@
+package com.ltvs.util.websocket;
+
+import java.io.IOException;
+
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.ServerEndpoint;
+
+import com.ltvs.util.algorithmic.KnnMain;
+
+@ServerEndpoint("/websocket")
+public class WebSocket {
+
+	public static StringBuilder msgToWeb = new StringBuilder();
+	
+	private Session session;
+
+	@OnOpen
+	public void onopen(Session session) {
+//		System.out.println("开启连接");
+	}
+
+	@OnClose
+	public void onclose(Session session) {
+//		System.out.println("结束连接");
+	}
+
+	@OnMessage
+	public void message(Session session, String msg) {
+//		System.out.println("客户端：" + msg);
+		this.session = session;
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						session.getBasicRemote().sendText(WebSocket.msgToWeb.toString());
+						Thread.sleep(1000);
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}).start();;
+		// session.getBasicRemote().sendText("ok");
+	}
+}

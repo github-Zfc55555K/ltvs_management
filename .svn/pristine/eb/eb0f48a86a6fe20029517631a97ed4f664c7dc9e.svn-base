@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>搜索</title>
+<link rel="shortcut icon" href="./img/logo_nw.png" type="image/x-icon" />
+  <link href="css/bootstrap.min.css" title="" rel="stylesheet" />
+  <link title="" href="css/style.css" rel="stylesheet" type="text/css" />
+  <link title="" href="css/bootstrap-treeview.css" rel="stylesheet" type="text/css" />
+  <script src="js/jquery-1.11.1.min.js" type="text/javascript"></script>
+  <script src="js/bootstrap.min.js" type="text/javascript"></script>
+  <script src="js/bootstrap-treeview.min.js" type="text/javascript"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row clearfix">
+            <div class="col-md-12 column">
+                <h3 class="text-center text-info">
+                   南方电网公司&nbsp&nbsp低压配电网&nbsp&nbsp线损智能问答系统
+                </h3>
+            </div>
+        </div>
+        <!-- <div class="row clearfix">
+            <div class="col-md-2 column">
+            </div>
+            <div class="col-md-6 column">
+            </div>
+            <div class="col-md-4 column">
+            </div>
+        </div> -->
+        <div class="panel-body">
+            <form class="form-horizontal adminex-form" method="get">
+                    <div class="form-group">
+                            <label class="col-sm-2 control-label">智能搜索</label>
+                            <div class="col-sm-8">
+                                <input id="ser" type="text" class="form-control tooltips" data-trigger="hover" data-toggle="tooltip" title="" placeholder="在此输入" data-original-title="Tooltip goes here">              
+                            </div>
+                            <button class="col-sm-2 btn btn-primary" type="button" onclick="execute()">搜索一下</button>
+                        </div>
+            </form>
+        </div>
+        <div class="row clearfix">
+            <div class="col-md-3 column">
+                    <div id="tree"></div>
+            </div>
+            <div class="col-md-1 column">
+            </div>
+            <div class="col-md-8 column">
+                    <h3 id="result"> </h3>
+                    <div class="well">
+                        <h4 id="detInfo"></h4>
+                        <p id="info"></p>
+                    </div>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#myModal">知识图谱展示</button>
+            </div>
+        </div>
+
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="myModalLabel">知识图谱</h4>
+                        </div>
+                        <div class="modal-body" id="pic"></div>                       
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal -->
+            </div>
+    </div>
+    <script>
+    $(function() {
+        $("#info").html("台区ID：200024690<br>台区名称：塘坑<br>台区异常数据：2018年4月1日台区高损，线损率为36.73%<br>台区异常原因：异常原因为台区老旧，供电半径长，线径较细，导致台区线损较高");
+        ///ltvs_management/src/main/webapp/
+        $("#pic").html('<img src="img/333.jpg">');
+    $('#tree').treeview({
+        data: getTree()//节点数据
+    });
+})
+function getTree() {
+    //节点上的数据遵循如下的格式：
+    var tree = [ {
+        text: "广州",
+        nodes: [{
+            text: "白云区",
+            nodes: [{
+                text: "供电所1",
+                nodes:[{
+                    text:"台区1"
+                },{
+                    text:"台区2"
+                },{
+                    text:"台区3"
+                },{
+                    text:"台区4"
+                }]
+            }, {
+                text: "供电所2"
+            }]
+        }, {
+            text: "天河区"
+        }]
+    }, {
+        text: "深圳"
+    }, {
+        text: "广西"
+    }, {
+        text: "云南"
+    }];
+
+    return tree;
+}
+
+function execute(){
+    var text = $('#tree').treeview('getSelected');
+    // console.log(text[0].text)
+    var ser = $("#ser").val();
+    if(text[0].text == "台区1" && ser == "台区线损情况"){
+        $("#result").html("结果");
+        $("#detInfo").html("详细信息");
+        $("#info").html("台区ID：02G0091127<br>台区名称：碧水天湾3#<br>台区异常数据：2018年2月23日台区高损，线损率为728.8%<br>"+
+        		"异常原因：用户（8025019075）胡林中学表计烧坏，一相电压为0，其他两相不足70伏，三相不平衡。<br>判断依据：三相电压值相比较，电压差值过大");
+        $("#pic").html('<img src="img/555.jpg">');
+    }else if(text[0].text != "台区1" && ser == "台区线损情况"){
+        $("#pic").html('');
+        $("#result").html("结果");
+        $("#detInfo").html("详细信息");
+        $("#info").html("该台区线损正常");
+    }else if(text[0].text == "台区3" && ser == "为什么线损异常"){
+        $("#pic").html('<img src="img/777.jpg">');
+        $("#result").html("结果");
+        $("#detInfo").html("详细信息");
+        $("#info").html("台区ID：794128<br>台区名称：庆丰四队<br>台区异常数据：2018年3月18日台区负损，线损率为-110.57%<br>"+
+        		"台区异常原因：初步判断为集中器传输出现故障问题。<br>判断依据：该台区21日低压用户数据全漏抄，22日一次性抄回，导致21日冻结供电量较大为高损，22日供电量较小形成负损,23日还原正常线损。");
+    }else if(text[0].text != "台区3" && ser == "为什么线损异常"){
+        $("#pic").html('');
+        $("#result").html("结果");
+        $("#detInfo").html("详细信息");
+        $("#info").html("该台区线损正常");
+    }
+}
+    </script>
+</body>
+</html>

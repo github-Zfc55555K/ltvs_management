@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<script src="../../js/highcharts.js"></script>
+<script src="../../js/exporting.js"></script>
+<script src="../../js/sankey.js"></script>
+<script src="../../js/oldie.js"></script>
+<script src="../../js/jquery-1.8.3.min.js"></script>
+<script src="../../js/lay/layer.js"></script>
+<script src="../../js/grid-light.js"></script>
+</head>
+<body>
+	<div id="container"></div>
+	<script src="../../js/organization.js"></script>
+	<script type="text/javascript">
+		function getQueryString(name) {
+			var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+			var r = window.location.search.substr(1).match(reg);
+			if (r != null)
+				return unescape(r[2]);
+			return null;
+		}
+		$(function() {
+			var data2;
+			var data3 = [];
+			$.ajax({
+						type : "post",
+						url : "/ltvs_management/showData",
+						async : false,
+						data : {
+							id : getQueryString("id")
+						},
+						success : function(data) {
+							data2 = eval('(' + data + ')');
+							data3.push(data2[0].id, data2[1].id);
+							for (var k = 0, length = data2.length - 2; k < length; k++) {
+								var data4 = [];
+								data4.push(data2[1].id, data2[k + 2].id)
+								data3.push(data4);
+							}
+						}
+					});
+			Highcharts.chart('container', {
+				chart : {
+					height : 550,
+					inverted : true,
+					//plotBackgroundImage:"./img/lognbg_nw.jpg"
+					plotBackgroundColor : "white"
+				},
+				title : {
+					text : ' '
+				},
+				credits : {
+					enabled : false
+				},
+				exporting : {
+					enabled : false
+				//设置导出按钮不可用    
+				},
+				series : [ {
+					type : 'organization',
+					name : '10KW线路',
+					keys : [ 'from', 'to' ],
+					data : data3,
+					/* levels: [ {
+						level: 0,
+						color: 'silver',
+						dataLabels: {
+							color: 'blue'
+						},
+						height: 250
+					}, {
+						level: 1,
+						color: 'silver',
+						dataLabels: {
+							color: 'black'
+						},
+						height: 25
+					}  ], */
+					nodes : data2,
+					colorByPoint : false,
+					color : '#007ad0',
+					dataLabels : {
+						color : 'white'
+					},
+					borderColor : 'white',
+					nodeWidth : 60,
+				} ],
+				tooltip : {
+					outside : true
+				},
+				exporting : {
+					allowHTML : true,
+					sourceWidth : 800,
+					sourceHeight : 600
+				}
+			});
+		})
+		function notice(id, name) {
+			/* var index = layer.open({
+				  type: 2,
+				  content: ,
+				  area: ['720px', '395px'],
+				  maxmin: false
+				});
+				layer.tips(index);
+				//window.open ("modules/mdlev/show.html") */
+			/* layer.tips({
+				type : 2,
+				title : 'layer mobile页',
+				shadeClose : true,
+				shade : 0.8,
+				area : [ '380px', '90%' ],
+				content : '/ltvs_management/modules/mdlev/show.html?id=' + id
+						+ '&name=' + name //iframe的url
+			}); */
+				
+			layer.open({
+				  type: 2 //此处以iframe举例
+				  ,title: '信息'
+				  ,area: ['590px', '360px']
+				  ,shade: 0
+				  ,maxmin: true
+				  ,content: '/ltvs_management/modules/mdlev/show.html?id=' + id
+					+ '&name=' + name
+				});
+		}
+	</script>
+</body>
+</html>

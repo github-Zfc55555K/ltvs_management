@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<TITLE>逻辑视图</TITLE>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="../../css/layui.css">
+	<script src="../../js/jquery-1.11.1.min.js"></script>
+	<script src="../../js/drag.js"></script>
+	<script src="../../js/zoom.js"></script>
+	<script src="js/svg.js"></script>
+	<script type="text/javascript" src="../../js/layui.js"></script>
+	<script src="../../js/echarts-all.js"></script>
+
+</head>
+
+<body>
+	<!-- <div style="max-width: 1800px;max-height: 900px;">
+		<div id="container" style="border:2px solid rgb(145, 56, 56);margin-left: 230px;margin-top: 15px"></div>
+	</div -->
+	
+	<div id="topotree" style="width: 2000px;height:1000px;margin-left: 100px"></div>
+<script>
+var myChart = echarts.init(document.getElementById('topotree'));
+    option = {
+        title : {
+            text: ''
+        },
+        toolbox: {
+            show : true,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
+        series : [
+            {
+                name:'树图',
+                type:'tree',
+                orient: 'vertical',  // vertical horizontal
+                rootLocation: {x: '30%',y: 230}, // 根节点位置  {x: 100, y: 'center'}
+                nodePadding: 80,
+                layerPadding: 150,
+                hoverable: false,
+                roam: true,
+                symbolSize: 0,
+                itemStyle: {
+                    normal: {
+                        color: '#4883b4',
+                        label: {
+                            show: true,
+                            position: 'right',
+                            formatter: "{b}",
+                            textStyle: {
+                                color: '#000',
+                                fontSize: 5
+                            }
+                        },
+                        lineStyle: {
+                            color: '#ccc',
+                            type: 'broken' // 'curve'|'broken'|'solid'|'dotted'|'dashed'
+    
+                        }
+                    },
+                    emphasis: {
+                        color: '#4883b4',
+                        label: {
+                            show: false
+                        },
+                        borderWidth: 0
+                    }
+                },
+                
+                data: [{
+                    name : '武汉大学工学部网球场',
+                    children:[{
+                        name : "4071\n\n\n\n\n\n武汉大学工学部四舍照明馈线柜\n1.70E-07Ω",
+                        children : [
+                            {
+                                name : "4012\n\n武汉大学工学部四舍照明\n1-2楼低压配电柜"
+                            },
+                            {
+                                name : "4013\n\n武汉大学工学部四舍照明\n3-4楼低压配电柜"
+                            },
+                            {
+                                name : "4014\n\n武汉大学工学部四舍照明\n5-6楼低压配电柜"
+                            },
+                            {
+                                name : "4015\n\n武汉大学工学部四舍\n1楼左配电箱"
+                            },
+                            {
+                                name : "4016\n\n武汉大学工学部四舍\n2楼右配电箱"
+                            }
+                        ]
+                    },{
+                        name : "4072\n\n\n\n\n\n武汉大学工学部四舍空调1-3馈线柜\n1.70E-07Ω",
+                        children : [
+                            {
+                                name : "4052\n\n武汉大学工学部四舍空调\n1楼低压配电柜"
+                            },
+                            {
+                                name : "4053\n\n武汉大学工学部四舍空调\n2楼低压配电柜"
+                            },
+                            {
+                                name : "4054\n\n武汉大学工学部四舍空调\n3楼低压配电柜"
+                            }
+                        ]
+                    },{
+                        name : "4073\n\n\n\n\n\n武汉大学工学部四舍空调4-6馈线柜\n1.70E-07Ω",
+                        children : [
+                            {
+                                name : '4058\n\n武汉大学工学部四舍空调\n4楼低压配电柜'
+                            },
+                            {
+                                name : '4056\n\n武汉大学工学部四舍空调\n5楼低压配电柜'
+                            },
+                            {
+                                name : '4057\n\n武汉大学工学部四舍空调\n6楼低压配电柜'
+                            },
+                        ]
+                    },{
+                        name : "4074\n\n\n\n\n\n武汉大学工学部四舍热泵馈线柜\n1.70E-07Ω",
+                        children : [
+                            {
+                                name : "4092\n\n武汉大学工学部四舍\n开水器分支"
+                            },
+                            {
+                                name : "4093\n\n武汉大学工学部四舍\n热泵分支"
+                            },
+                        ]
+                    },{
+                        name : "4083\n\n\n\n\n\n武汉大学工学部深港苑泵馈线柜\n2.70E-07Ω",
+                        children : [
+                            {
+                                name : "4021\n\n武汉大学工学部\n深港苑1号泵"
+                            },
+                            {
+                                name : "4022\n\n武汉大学工学部\n深港苑2号泵"
+                            },
+                            {
+                                name : "4023\n\n武汉大学工学部\n深港苑3号泵"
+                            },
+                            {
+                                name : "4024\n\n武汉大学工学部\n深港苑4号泵"
+                            },
+                            {
+                                name : "4025\n\n武汉大学工学部\n深港苑5号泵"
+                            }
+                        ]
+                    }]
+                }
+                    ]
+            }
+        ]
+    };
+                        
+    myChart.setOption(option);
+</script>
+    <!-- <script src="js/views.js"></script>
+     -->
+
+</body>
+</html>

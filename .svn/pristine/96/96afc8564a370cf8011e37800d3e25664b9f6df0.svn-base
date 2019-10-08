@@ -1,0 +1,86 @@
+package com.ltvs.util.websocket;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArraySet;
+
+import javax.websocket.OnClose;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.ServerEndpoint;
+
+
+import com.alibaba.fastjson.JSON;
+import com.ltvs.quartz.job.QuartzJob;
+
+@ServerEndpoint("/websocket")
+public class WebSocket {
+
+	public static StringBuffer msgToWeb = new StringBuffer();
+
+	private Map<String, String> map = new HashMap<>();
+	
+	private Session session;
+
+	private CopyOnWriteArraySet<WebSocket> sessions = new CopyOnWriteArraySet<>();
+
+	/**
+	 * 开启连接
+	 * 
+	 * @param session
+	 */
+	@OnOpen
+	public void onopen(Session session) {
+		// System.out.println(session.getId()+"打开");
+		msgToWeb.setLength(0);
+		sessions.add(this);
+	}
+
+	/**
+	 * 结束连接
+	 * 
+	 * @param session
+	 */
+	@OnClose
+	public void onclose(Session session) {
+		sessions.remove(this);
+	}
+
+	/**
+	 * 与客户端通信
+	 * 
+	 * @param session
+	 * @param msg
+	 */
+	@OnMessage
+	public void message(Session session, String msg) {
+		// System.out.println("客户端：" + msg);
+		this.session = session;
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						if (session.isOpen()) {
+							map.put("msg", WebSocket.msgToWeb.toString());
+							map.put("pro", QuartzJob.progress.toString());
+							String json = JSON.toJSONString(map);
+							synchronized (session) {
+								session.getBasicRemote().sendText(json);
+							}
+							Thread.sleep(1000);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}).start();
+		;
+	}
+}

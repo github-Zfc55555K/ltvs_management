@@ -1,0 +1,104 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">	<meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <script src="./js/highcharts.js"></script>
+        <script src="./js/exporting.js"></script>
+        <script src="./js/sankey.js"></script>
+        <script src="./js/oldie.js"></script>
+        <script src="./js/jquery-1.8.3.min.js"></script>
+        <script src="./js/lay/layer.js"></script>
+        <script src="./js/grid-light.js"></script>
+    </head>
+    <body>
+        <div id="container" ></div>
+        <script src="./js/organization.js"></script>
+        <script type="text/javascript">
+        $(function() {
+	    	var data2;
+	    	var data3=[];
+	        $.ajax({
+				type : "post",
+				url : "/ltvs_management/showData",
+				async:false,
+				data : {
+					name : "小区1号"
+				},
+				success : function(data) {
+					data2 = eval('('+data+')');
+					for (var k = 0, length = data2.length-1; k < length; k++) {
+						var data4 = [];
+						data4.push(data2[0].id,data2[k+1].id)
+						data3.push(data4);
+					}
+				}
+			}); 
+        Highcharts.chart('container', {
+        	chart: {
+        		height: 550,
+        		inverted: true,
+        		//plotBackgroundImage:"./img/lognbg_nw.jpg"
+        		plotBackgroundColor : "white"
+        	},
+        	title: {
+        		text: ' '
+        	},
+        	credits: {
+   		     enabled: false
+   			},
+   		    exporting: {   
+   		   		enabled: false  //设置导出按钮不可用    
+   		    },   
+        	series: [{
+        		type: 'organization',
+        		name: '白云区',
+        		keys: ['from', 'to'],
+        		data: data3,
+        		/* levels: [ {
+        			level: 0,
+        			color: 'silver',
+        			dataLabels: {
+        				color: 'blue'
+        			},
+        			height: 25
+        		}, {
+        			level: 1,
+        			color: 'silver',
+        			dataLabels: {
+        				color: 'black'
+        			},
+        			height: 25
+        		}  ], */
+        		nodes: data2,
+        		colorByPoint: false,
+        		color: '#007ad0',
+        		dataLabels: {
+        			color: 'white'
+        		},
+        		borderColor: 'white',
+        		nodeWidth: 70
+        	}],
+        	tooltip: {
+        		outside: true
+        	},
+        	exporting: {
+        		allowHTML: true,
+        		sourceWidth: 800,
+        		sourceHeight: 600
+        	}
+        });
+        })
+		function notice(id,name){
+        	var index = layer.open({
+        		  type: 2,
+        		  content: '/ltvs_management/modules/mdlev/show.html?id='+id+'&name='+name,
+        		  area: ['520px', '395px'],
+        		  maxmin: true
+        		});
+        		layer.full(index);
+        		//window.open ("modules/mdlev/show.html")
+       	}
+        </script>
+    </body>
+</html>

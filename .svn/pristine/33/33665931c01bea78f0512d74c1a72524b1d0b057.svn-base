@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ltvs.mapping.LtvsUserMapper" >
+  
+  <select id = "findUser" resultType="com.ltvs.pojo.LtvsUser" parameterType="com.ltvs.pojo.LtvsUser">
+  	select 
+	t.USER_NAME as userName,t.USER_PASSWORD as userPassword
+ 	from ltvs_user t 
+  	where 
+  	t.USER_NAME = #{userName,jdbcType = VARCHAR}
+  	and
+  	t.USER_PASSWORD = #{userPassword,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id = "delUser">
+  	<foreach collection="oredCriteria" item="criteria" separator="and" >
+  	delete from ltvs_user t
+  	where
+  	t.USER_ID = #{criteria.userId,jdbcType = INTEGER}
+  	</foreach>
+  </delete>
+</mapper>

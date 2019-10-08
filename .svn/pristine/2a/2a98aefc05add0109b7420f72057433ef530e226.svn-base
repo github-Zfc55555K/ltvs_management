@@ -1,0 +1,112 @@
+package com.ltvs.service.impl;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ltvs.mapping.ITransformerInfoMapper;
+import com.ltvs.pojo.CommunityInfo;
+import com.ltvs.pojo.ElectricityConsumer;
+import com.ltvs.pojo.JunctionBox;
+import com.ltvs.pojo.LineSegment;
+import com.ltvs.pojo.LtvsTransformerInfo;
+import com.ltvs.pojo.OperatingTransformer;
+import com.ltvs.pojo.TaiwanInfo;
+import com.ltvs.service.ITransformerInfoService;
+
+@Service
+public class TransformerInfoServiceImpl implements ITransformerInfoService {
+
+    @Autowired
+    private ITransformerInfoMapper transformerInfoMapper;
+
+    /**
+     * 获得所有的地图电厂的点 Description
+     * 
+     * @return
+     * @see com.ltvs.service.ITransformerInfoService#getAllTransformer()
+     */
+    @Override
+    public List<LtvsTransformerInfo> getAllTransformer() {
+        return transformerInfoMapper.getAllTransformer();
+    }
+
+    /**
+     * 根据名称查找id Description
+     * 
+     * @param name
+     * @return
+     * @see com.ltvs.service.ITransformerInfoService#findIdByName(java.lang.String)
+     */
+    @Override
+    public String findNameByIdTq(String id) {
+        return transformerInfoMapper.findNameByIdTq(id);
+    }
+
+    /**
+     * 根据小区id查找用电客户 Description
+     * 
+     * @param name
+     * @return
+     * @see com.ltvs.service.ITransformerInfoService#findElectricityConsumer(java.lang.String)
+     */
+    @Override
+    public List<ElectricityConsumer> findElectricityConsumer(String id, String name) {
+        return transformerInfoMapper.findElectricityConsumer(id, name);
+    }
+
+
+    /**
+     * 获得所有分接箱信息
+     */
+    @Override
+    public List<JunctionBox> getAllJunctionBox() {
+        return transformerInfoMapper.getAllJunctionBox().stream().filter(fjx -> fjx.getGpsjd() != null).collect(Collectors.toList());
+    }
+
+    /**
+     * 地图插入折线时 验证折线编号否存在
+     * 
+     * @return
+     */
+    @Override
+    public Integer validateLine(String bh) {
+        return transformerInfoMapper.validateLine(bh);
+    }
+
+    /**
+     * 存储线路信息
+     */
+    @Override
+    public Integer saveLine(String xlbh, Integer lev, String path) {
+        return transformerInfoMapper.saveLine(xlbh, lev, path);
+    }
+
+    @Override
+    public List<LineSegment> getLineByLev(Integer lev) {
+        return transformerInfoMapper.getLineByLev(lev);
+    }
+
+    @Override
+    public List<TaiwanInfo> getAllTqInfo() {
+        return transformerInfoMapper.getAllTqInfo();
+    }
+
+	@Override
+	public List<CommunityInfo> getAllXqInfo() {
+		return transformerInfoMapper.getAllXqInfo().stream().filter(xq -> xq.getGpsjd() != null).collect(Collectors.toList());
+	}
+
+    @Override
+    public List<CommunityInfo> findAllCommunityInfoByTqId(String id) {
+        return transformerInfoMapper.findAllCommunityInfoByTqId(id);
+    }
+
+	@Override
+	public List<OperatingTransformer> getAllByqInfo() {
+		return transformerInfoMapper.getAllByq().stream().filter(byq -> byq.getGpsjd() != null).collect(Collectors.toList());
+	}
+
+}

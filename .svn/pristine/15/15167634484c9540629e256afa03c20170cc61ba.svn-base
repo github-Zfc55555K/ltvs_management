@@ -1,0 +1,37 @@
+package com.ltvs.pojo;
+
+public class Dendrogram {
+    // id
+    private String dataNodeid;
+
+    // 内容
+    private String text;
+
+    // 是否懒加载
+    private Boolean lazyLoad;
+
+    public Boolean getLazyLoad() {
+        return lazyLoad;
+    }
+
+    public void setLazyLoad(Boolean lazyLoad) {
+        this.lazyLoad = lazyLoad;
+    }
+
+    public String getDataNodeid() {
+        return dataNodeid;
+    }
+
+    public void setDataNodeid(String dataNodeid) {
+        this.dataNodeid = dataNodeid;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+}

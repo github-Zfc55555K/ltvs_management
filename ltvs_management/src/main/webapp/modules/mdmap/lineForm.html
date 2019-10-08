@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>表单</title>
+    <link rel="stylesheet" href="../../css/layui.css">
+    <link rel="stylesheet" href="css/map.css">
+    <script type="text/javascript" src="../../js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="../../js/layui.js"></script>
+</head>
+
+<body>
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="width:90px">线路编号</label>
+        <div class="layui-input-inline">
+            <input type="text" id="bh" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input"
+                style="width:250px">
+        </div>
+    </div>
+    <script>
+     var callbackdata = function () {
+            var bh = $('#bh').val()
+            return bh;
+        }
+    </script>
+</body>
+</html>

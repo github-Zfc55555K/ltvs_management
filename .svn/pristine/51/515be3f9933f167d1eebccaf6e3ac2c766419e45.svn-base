@@ -1,0 +1,145 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+	<title>定时任务</title>
+	<link title="" href="../../css/style.css" rel="stylesheet" type="text/css" />
+	<link title="blue" href="../../css/dermadefault.css" rel="stylesheet" type="text/css" />
+	<link href="../..//css/bootstrap.min.css" title="" rel="stylesheet" />
+	<link rel="stylesheet" href="../../css/layui.css">
+	<script type="text/javascript" src="../../js/jquery-1.11.1.min.js"></script>
+	<script src="../../js/bootstrap.min.js" type="text/javascript"></script>
+</head>
+
+<body>
+	<div class="down-main">
+		<div class="right-product my-index right-full">
+			<div class="container-fluid">
+				<div class="info-center">
+					<!---title----->
+
+					<div class="info-title">
+						<div class="pull-left">
+							<h4>
+								<strong>您好，欢迎进入 低压配电网拓扑辨识与可视化分析系统：</strong>
+							</h4>
+							<p>
+								关于定时任务时间戳详情请访问 <a href="https://www.pppet.net/" target="_blank">详情进入</a>
+							</p>
+						</div>
+						<div class="time-title pull-right">
+							<div class="year-month pull-left">
+								<p id="w">星期二</p>
+								<p id="ymd">
+									<span>2016</span>年8月23日
+								</p>
+							</div>
+							<div class="hour-minute pull-right">
+								<strong id="hm">9:00</strong>
+							</div>
+						</div>
+						<div class="clearfix"></div>
+					</div>
+
+
+					<hr class="layui-bg-blue">
+
+					<div class="row">
+						<div class="col-sm-12">
+							<section class="panel">
+								<header class="panel-heading">
+									拓扑辨识任务
+									<span class="tools pull-right">
+										<a href="javascript:;" class="fa fa-chevron-down"></a>
+										<a href="javascript:;" class="fa fa-times"></a>
+									</span>
+								</header>
+								<div class="panel-body">
+									<table class="table  table-hover general-table">
+										<thead>
+											<tr>
+												<th> 任务名称</th>
+												<th>任务说明</th>
+												<th>时间戳</th>
+												<th>范围</th>
+												<th>操作</th>
+												<th>记录</th>
+												<th>状态</th>
+												<th>进度</th>
+											</tr>
+										</thead>
+										<tbody>
+
+											<tr>
+												<td id="jobName">dsjob</td>
+												<td id="jobInfo">定时执行辨识算法</td>
+												<td id="cron">0 0 1 * * ? * </td>
+												<input type="hidden" id="cronname"/>
+												<td>全部 </td>
+												<td><button class="layui-btn layui-btn-xs layui-btn-normal"
+														onclick="executeJob(1)">开始任务</button>
+													<button class="layui-btn layui-btn-xs layui-btn-normal"
+														onclick="executeJob(2)">暂停任务</button>
+													<button class="layui-btn layui-btn-xs layui-btn-normal"
+														onclick="executeJob(3)">恢复任务</button>
+													<button class="layui-btn layui-btn-xs layui-btn-normal"
+														onclick="executeJob(4)">结束任务</button>
+												</td>
+												<th><a href="javascript:printLog()">日志</a></th>
+												<td id="jobStatus"><span class="label label-success label-mini" >完成</span></td>
+												<input type="hidden" id="status"/>
+												<td>
+													<div class="progress progress-striped progress-xs">
+														<div style="width: 0" aria-valuemax="100" aria-valuemin="0"
+															aria-valuenow="40" role="progressbar"
+															class="progress-bar progress-bar-info" id="progress1">
+															<span id="progressText"></span>
+														</div>
+													</div>
+												</td>
+											</tr>
+
+											<tr>
+												<td>job2</td>
+												<td>执行辨识算法</td>
+												<td> </td>
+												<td><select class="form-control m-bot15">
+													<option>台区 1</option>
+													<option>台区 2</option>
+													<option>台区 3</option>
+												</select> </td>
+												<td><button class="layui-btn layui-btn-xs layui-btn-normal"
+														onclick="executeJob(1,this)">开始任务</button>
+													<button class="layui-btn layui-btn-xs layui-btn-normal"
+														onclick="executeJob(4,this)">结束任务</button>
+												</td>
+												<th><a href="#">日志</a></th>
+												<td><span class="label label-success label-mini">完成</span></td>
+												<td>
+													<div class="progress progress-striped progress-xs">
+														<div style="width: 70%" aria-valuemax="100" aria-valuemin="0"
+															aria-valuenow="40" role="progressbar"
+															class="progress-bar progress-bar-info">
+															<span>70%</span>
+														</div>
+													</div>
+												</td>
+											</tr>
+
+										</tbody>
+									</table>
+								</div>
+							</section>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+		<script src="js/timer.js" type="text/javascript"></script>
+</body>
+
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <TITLE>逻辑视图</TITLE>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <script src="echarts.min.js"></script>
+
+</head>
+
+<body>
+    <!-- <div style="max-width: 1800px;max-height: 900px;">
+		<div id="container" style="border:2px solid rgb(145, 56, 56);margin-left: 230px;margin-top: 15px"></div>
+	</div -->
+
+    <div id="topotree" style="width: 900px;height:700px;"></div>
+    <script>
+        var myChart = echarts.init(document.getElementById('topotree'));
+        var webkitDep = {
+            "type": "force",
+            // "categories": [//关系网类别，可以写多组  
+            //     {
+            //         "name": "网格关系",//关系网名称  
+            //         "keyword": {},
+            //         "base": "网格关系"
+            //     }
+            // ],
+            "nodes": [//展示的节点  
+                {
+                    "id" : 0 ,
+                    "name": "塘坑",
+                    "symbolSize":100,            //设置大小
+                    "itemStyle": {
+	            	"color": '#008B8B'				// 关系图节点标记的颜色
+	            }
+                },
+                {
+                    "id" : 1 ,
+                    "name": "2018/4/1",
+                    "symbolSize":50,            //设置大小
+                    "itemStyle": {
+	            	"color": '#1E90FF'				// 关系图节点标记的颜色
+	            }
+                },
+                {
+                    "id" : 2 ,
+                    "name": "高损",
+                    "symbolSize":50,            //设置大小
+                    "itemStyle": {
+	            	"color": '#FFD700'				// 关系图节点标记的颜色
+	            }
+                },
+                {
+                    "id" : 3,
+                    "name": "36.73%",
+                    "symbolSize":50,            //设置大小
+                    "itemStyle": {
+	            	"color": '#C0C0C0'				// 关系图节点标记的颜色
+	            }
+                },
+                {
+                    "id" : 4 ,
+                    "name": "台区",
+                    "symbolSize":50,            //设置大小
+                    "itemStyle": {
+	            	"color": '#DB7093'				// 关系图节点标记的颜色
+	            }
+                },
+                {
+                    "id" : 5,
+                    "name": "老旧",
+                    "symbolSize":50,            //设置大小
+                    "itemStyle": {
+	            	"color": '#DB7093'				// 关系图节点标记的颜色
+	            }
+                },
+                {
+                    "id" : 6,
+                    "name": "线径",
+                    "symbolSize":50,            //设置大小
+                    "itemStyle": {
+	            	"color": '#DB7093'				// 关系图节点标记的颜色
+	            }
+                },
+                {
+                    "id" : 7 ,
+                    "name": "供电半径",
+                    "symbolSize":50,            //设置大小
+                    "itemStyle": {
+	            	"color": '#DB7093'				// 关系图节点标记的颜色
+	            }
+                },
+                {
+                    "id" : 8 ,
+                    "name": "细软",
+                    "symbolSize":50,            //设置大小
+                    "itemStyle": {
+	            	"color": '#DB7093'				// 关系图节点标记的颜色
+	            }
+                },
+                {
+                    "id" : 9 ,
+                    "name": "过大",
+                    "symbolSize":50,            //设置大小
+                    "itemStyle": {
+	            	"color": '#DB7093'				// 关系图节点标记的颜色
+	            }
+                },
+            ],
+            "links": [//节点之间连接  
+                {
+                    "source": 0,//起始节点，0表示第一个节点  
+                    "target": 1, //目标节点，1表示与索引为1的节点进行连接  
+                    label: {
+                        normal: {
+                            show: true,
+                            formatter: '异常时间'
+                        }
+                    },
+                },
+                {
+                    "source": 0,
+                    "target": 2,
+                    label: {
+                        normal: {
+                            show: true,
+                            formatter: '线损状态'
+                        }
+                    },
+
+                },
+                {
+                    "source": 3,
+                    "target": 0,
+                    label: {
+                        normal: {
+                            show: true,
+                            formatter: '线损率'
+                        }
+                    },
+
+                },
+                {
+                    "source": 0,
+                    "target": 4,
+                    label: {
+                        normal: {
+                            show: true,
+                            formatter: '异常原因'
+                        }
+                    },
+
+                },
+                {
+                    "source": 4,
+                    "target": 5,
+                    
+
+                },
+                {
+                    "source": 4,
+                    "target": 6,
+                    
+
+                },
+                {
+                    "source": 6,
+                    "target": 7,
+                    
+
+                },
+                {
+                    "source": 6,
+                    "target": 8,
+                    
+
+                },
+                {
+                    "source": 7,
+                    "target": 9,
+                    
+
+                },
+            ]
+        };
+
+        option = {
+            legend: {
+                data: ['网格关系']//此处的数据必须和关系网类别中name相对应  
+            },
+            series: [{
+                type: 'graph',
+                layout: 'force',
+                animation: false,
+                label: {
+                    normal: {
+                        show: true,
+                        position: 'inside'
+                    }
+                },
+                draggable: true,
+                data: webkitDep.nodes.map(function (node, idx) {
+                    node.id = idx;
+                    return node;
+                }),
+                categories: webkitDep.categories,
+                force: {
+                    edgeLength: 100,//连线的长度  
+                    repulsion: 1000  //子节点之间的间距  
+                },
+                edges: webkitDep.links,
+                edgeSymbol: ['circle', 'arrow']
+            }]
+        };
+        myChart.setOption(option); 
+    </script>
+    <!-- <script src="js/views.js"></script>
+     -->
+
+</body>
+
+</html>

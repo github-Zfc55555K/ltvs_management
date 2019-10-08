@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ltvs.mapping.ITransformerInfoMapper">
+	<resultMap type="com.ltvs.pojo.LtvsTransformerInfo" id="tMap">
+		<result column="bdzbh" property="bdzbh" />
+		<result column="bdzmc" property="bdzmc" />
+		<result column="gpswd" property="gpswd" />
+		<result column="gpsjd" property="gpsjd" />
+		<result column="haschild" property="hasChild" />
+		<result column="hierarchy" property="hierarchy" />
+	</resultMap>
+
+	<resultMap type="com.ltvs.pojo.JunctionBox" id="fjxMap">
+		<result column="fjxbs" property="fjxbs" />
+		<result column="fjxmc" property="fjxmc" />
+		<result column="haschild" property="hasChild" />
+		<result column="hierarchy" property="hierarchy" />
+		<result column="gpsjd" property="gpsjd" />
+		<result column="gpswd" property="gpswd" />
+	</resultMap>
+
+	<resultMap type="com.ltvs.pojo.LineSegment" id="lineMap">
+		<result column="xlbh" property="xlbh" />
+		<result column="xlmc" property="xlmc" />
+		<result column="linepath" property="linepath" />
+	</resultMap>
+	
+	<resultMap type="com.ltvs.pojo.TaiwanInfo" id="tqMap">
+		<result column="tqbs" property="tqbs" />
+		<result column="tqbh" property="tqbh" />
+		<result column="tqmc" property="tqmc" />
+		<result column="haschild" property="hasChild" />
+		<result column="hierarchy" property="hierarchy" />
+		<result column="gpsjd" property="gpsjd" />
+		<result column="gpswd" property="gpswd" />
+	</resultMap>
+
+	<resultMap type="com.ltvs.pojo.CommunityInfo" id="xqMap">
+		<result column="xqbs" property="xqbs" />
+		<result column="xqmc" property="xqmc" />
+		<result column="sstq" property="sstq"/>
+		<result column="haschild" property="hasChild" />
+		<result column="hierarchy" property="hierarchy" />
+		<result column="gpsjd" property="gpsjd" />
+		<result column="gpswd" property="gpswd" />
+	</resultMap>
+
+<resultMap type="com.ltvs.pojo.OperatingTransformer" id="byqMap">
+		<result column="yxbyqbs" property="yxbyqbs" />
+		<result column="byqmc" property="byqmc" />
+		<result column="hierarchy" property="hierarchy" />
+		<result column="gpsjd" property="gpsjd" />
+		<result column="gpswd" property="gpswd" />
+	</resultMap>
+<select id="getAllByq" resultMap="byqMap">
+	SELECT a.YXBYQBS,a.BYQMC,a.GPSJD,a.GPSWD,a.HIERARCHY FROM ltvs_yxbyq a;
+</select>
+	<select id="getAllTransformer" resultMap="tMap">
+		SELECT
+		bdzbh,
+		bdzmc,
+		gpswd,
+		gpsjd,
+		haschild,
+		hierarchy
+		FROM
+		LTVS_BDZXX
+	</select>
+
+	<select id="getLineByLev" resultMap="lineMap">
+	SELECT
+	a.XLBH,
+	a.XLMC ,
+	a.LINEPATH
+	FROM
+	ltvs_xlxd a
+	WHERE
+	a.HIERARCHY = #{0}
+	</select>
+
+	<select id="getAllTqInfo" resultMap="tqMap">
+	SELECT
+	a.TQBS,
+	a.TQBH,
+	a.TQMC ,
+	a.HASCHILD,
+	a.HIERARCHY,
+	a.GPSWD,
+	a.GPSJD
+	FROM
+	ltvs_tqxx a 
+	</select>
+
+	<select id="getAllXqInfo" resultMap="xqMap">
+		SELECT
+		a.XQBS,
+		a.XQMC,
+		a.SSTQ,
+		a.HASCHILD,
+		a.HIERARCHY,
+		a.GPSJD,
+		A.GPSWD
+		FROM
+		ltvs_xxxq a
+	</select>
+
+	<select id="validateLine" resultType="Integer">
+		SELECT COUNT(*) FROM ltvs_xlxd a WHERE a.XLBH = #{0}
+	</select>
+
+	<insert id="saveLine">
+		INSERT INTO ltvs_xlxd ( XLXDBS, XLBH, XLMC, XLLXDM, XLLBDM, HIERARCHY, LINEPATH )
+VALUES
+	( #{0}, #{0}, 'xl', 1, 1, #{1}, #{2} )
+	</insert>
+
+	<select id="getAllJunctionBox" resultMap="fjxMap">
+	SELECT fjxbs,fjxmc,haschild,hierarchy,gpsjd,gpswd FROM LTVS_FJXXX
+	</select>
+
+	<select id="findNameByIdTq" resultType="String">
+		SELECT
+		TQMC
+		FROM
+		LTVS_TQXX t
+		where
+		t.TQBS = #{id,jdbcType = VARCHAR}
+	</select>
+	
+
+	<select id="findElectricityConsumer" resultType="com.ltvs.pojo.ElectricityConsumer">
+		SELECT
+		YHBH as yhbh,
+		YHMC as yhmc,
+		YDDZ as yddz,
+		KFXQBS as kfxqbs,
+		YDLBDM as ydlbdm,
+		DYDJDM as dydjdm,
+		HYFLDM as hyfldm,
+		JLFSDM as jlfsdm,
+		YHLBDM as yhlbdm,
+		GDDWBM as gddwbm,
+		FHXZDM as fhxzdm,
+		GHNHYLBDM as ghnhylbdm,
+		DYLXDM as dylxdm,
+		XHRQ as xhrq,
+		YHZTDM as yhztdm,
+		YFFLXDM as yfflxdm,
+		FKMSDM as fkmsdm,
+		FFMSDM as ffmsdm,
+		KHFQBZDM as khfqbzdm,
+		CJSJ as cjsj,
+		CZSJ as czsj,
+		SXSX as threeCircuits,
+		HIERARCHY as hierarchy
+		FROM
+		LTVS_YDKH t
+		where
+		t.KFXQBS = #{0,jdbcType=VARCHAR}
+	</select>
+
+	<select id = "findAllCommunityInfoByTqId" resultType = "com.ltvs.pojo.CommunityInfo">
+		SELECT
+		XQBS as xqbs,
+		XQMC as xqmc
+		from
+		LTVS_XXXQ t
+		where
+		t.SSTQ = #{id,jdbcType = VARCHAR}
+	</select>
+	
+</mapper>

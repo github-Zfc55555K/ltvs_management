@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>拖拽缩放</title>
+    <script src="../../js/jquery-1.11.1.min.js"></script>
+    <script src="../../js/drag.js"></script>
+    <script src="../../js/zoom.js"></script>
+</head>
+
+<body style="height: 100%; margin: 0; overflow: hidden;">
+    <div id="container" style="border:2px solid rgb(145, 56, 56);margin-left: 230px;margin-top: 15px">
+        <img src="resources/pic.jpg" width="1000" height="600">
+    </div>
+
+    <script>
+        window.onload = function () {
+            $solway.zoom({
+                ele: document.getElementById('container'),
+                scale: 1,
+                minScale: 0.1,
+                rate: 0.1
+            });
+            $solway.drag({
+                ele: document.getElementById('container')
+            });
+        };
+    </script>
+
+</body>
+
+</html>

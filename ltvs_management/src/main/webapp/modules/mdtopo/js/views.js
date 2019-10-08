@@ -1,0 +1,465 @@
+/**
+ * 逻辑图
+ */
+/**
+ * 设置缩放
+ */
+window.onload = function () {
+    $solway.zoom({
+        ele: document.getElementById('container'),
+        scale: 1,
+        minScale: 0.1,
+        rate: 0.1
+    });
+    $solway.drag({
+        ele: document.getElementById('container')
+    });
+};
+//弹窗控件
+var layer = null;
+layui.use('layer', function () {
+    layer = layui.layer;
+});
+var getQueryString = function (name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return unescape(r[2]);
+    return null;
+}
+var MAX_WIDTH = 1500;
+var MAX_HEIGHT = 900;
+var OPEN_HEIGHT = window.screen.height;
+var OPEN_WIDTH = window.screen.width;
+//svg 根元素
+var _SVG = SVG('container').size(1800, 900);
+//园
+var circle = _SVG.defs().circle(10).attr({
+    'fill-opacity': 0,
+    'stroke': '#000',
+    'stroke-width': 1.5
+});
+var circle2 = _SVG.defs().circle(2).attr({
+    'fill-opacity': 0,
+    'stroke': '#000',
+    'stroke-width': 1.5
+});
+// 虚线框
+var rect = _SVG.defs().rect(450, 130).attr({
+    'fill-opacity': 0,
+    'stroke': '#000',
+    'stroke-width': 1.5,
+    'stroke-dasharray': "5"
+});
+
+//基本元素
+class Dsvg {
+    constructor() { }
+    //正方形
+    drawRect(x, y, w, h) {
+        _SVG.rect(w, h).attr({
+            'fill-opacity': 0,
+            'stroke': '#000',
+            'stroke-width': 1.5
+        }).move(x, y);
+    }
+
+    //直线段
+    drawLine(start1, end1, start2, end2, fn) {
+        var l = _SVG.line(start1, end1, start2, end2).attr({
+            'fill-opacity': 0,
+            'stroke': '#000',
+            'stroke-width': 1.5
+        }).style("cursor:pointer;");
+        if (typeof (fn) == "function") {
+            l.on('mouseover', fn);
+        }
+        return l.node.id;
+    }
+    // 带颜色线段
+    drawLineWithColor(start1, end1, start2, end2, color, fn) {
+        var l = _SVG.line(start1, end1, start2, end2).attr({
+            'fill-opacity': 0,
+            'stroke': color,
+            'stroke-width': 1.5
+        }).style("cursor:pointer;");
+        if (typeof (fn) == "function") {
+            l.on('mouseover', fn);
+        }
+        return l.node.id;;
+    }
+    //带底部文字的图片
+    drawImg(path, x, y, text, fn, type) {
+        var img = _SVG.image(path).loaded(function (loader) {
+            this.size(loader.width, loader.height);
+            (function () {
+                _SVG.text(text).attr({
+                    "font-weight": "normal",
+                    "font-family": "Helvetica, Arial, sans-serif",
+                    "font-size": 12
+                }).move(x, y + loader.height);
+            })();
+        }).move(x, y).style("cursor:pointer;");
+        if (type != null || type != undefined) {
+            if (typeof (fn) == "function") {
+                img.on(type, fn);
+            }
+        } else {
+            if (typeof (fn) == "function") {
+                img.on('mouseover', fn);
+            }
+        }
+
+        return img.node.id;
+    }
+    //文字 默认大小为12
+    drawText(x, y, text) {
+        if (text.length > 11) {
+            text = insert_flg(text, "\n", 8)
+        }
+        _SVG.text(text).attr({
+            "font-weight": "normal",
+            "font-family": "Helvetica, Arial, sans-serif",
+            "font-size": 12
+        }).move(x, y);
+    }
+
+}
+function insert_flg(str, flg, sn) {
+    var newstr = "";
+    for (var i = 0; i < str.length; i += sn) {
+        var tmp = str.substring(i, i + sn);
+        newstr += tmp + flg;
+    }
+    return newstr;
+}
+// 封装的元素
+class Lgsvg {
+    constructor() { }
+    drawByq(x) {
+        var dsvg = new Dsvg();
+        var dataUtil = new DataUtil();
+        var id = dataUtil.getTqInfo();
+
+        var byqList = dataUtil.queryData("/ltvs_management/getByqInfo", { "tqid": id });
+        for (var i = 0; i < byqList.length; i++) {
+            //---------------第一层 (含变压器的 一层)-----------------
+            //变压器
+            dsvg.drawLine(125 + 300 * i, 60, 125 + 300 * i, 100);
+            (function (i) {
+                var byq = dsvg.drawImg("img/z_byq.svg", 100 + 300 * i, 100, "", () => {
+                    var ctx = byqList[i].yxbyqbs + "<br>" + byqList[i].byqmc + "<br>" + byqList[i].cjsj;
+                    layer.tips(ctx, "#" + byq, {
+                        tips: [1, '#78BA32']
+                    });
+                });
+            })(i);
+            //开关
+            dsvg.drawLine(125 + 300 * i, 150, 125 + 300 * i, 190);
+            dsvg.drawImg("img/z_kg.svg", 100 + 300 * i, 190, "", null);
+            //--------------互感器--------------------------------
+            var hgq = dsvg.drawImg("img/z_hgq.svg", 100 + 300 * i, 260, "", () => {
+                layer.tips("互感器", "#" + hgq, {
+                    tips: [1, '#78BA32']
+                });
+            });
+            dsvg.drawLine(125 + 300 * i, 240, 125 + 300 * i, 300);
+            //------------------------接地线--------------------------
+            dsvg.drawLine(125 + 300 * i, 138, 180 + 300 * i, 138);
+            dsvg.drawImg("img/dx.svg", 165 + 300 * i, 138, "", null);
+            //检测计量终端
+            dsvg.drawLine(150 + 300 * i, 285, 190 + 300 * i, 285);
+            dsvg.drawImg("img/z_zd.svg", 166 + 300 * i, 236, "", null);
+            //电房用电
+            dsvg.drawLine(125 + 300 * i, 170, 75 + 300 * i, 170);
+            dsvg.drawImg("img/z_yd.svg", 51 + 300 * i, 171, "", null);
+        }
+
+    }
+    //配电房
+    drawPdf() {
+        var dataUtil = new DataUtil();
+        var dsvg = new Dsvg();
+        var id = dataUtil.getTqInfo();
+        var pdxList = dataUtil.queryData("/ltvs_management/getPdfById", { "tqid": id });
+        for (var i = 0; i < pdxList.length; i++) {
+            var x = i;
+            //开关
+            dsvg.drawLine(125 + 200 * x, 150 + 150, 125 + 200 * x, 190 + 150);
+            dsvg.drawImg("img/z_kg.svg", 100 + 200 * x, 190 + 150, "", null);
+            //--------------互感器--------------------------------
+            (function (x) {
+                var hgq = dsvg.drawImg("img/z_hgq.svg", 100 + 200 * x, 260 + 150, "", () => {
+                    layer.tips("互感器", "#" + hgq, {
+                        tips: [1, '#78BA32']
+                    });
+                });
+            })(x);
+            dsvg.drawLine(125 + 200 * x, 240 + 150, 125 + 200 * x, 280 + 150);
+            //检测计量终端
+            dsvg.drawLine(150 + 200 * x, 285 + 150, 190 + 200 * x, 285 + 150);
+            dsvg.drawImg("img/z_zd.svg", 166 + 200 * x, 236 + 150, "", null);
+            //-------------负载------------------------
+            dsvg.drawLine(125 + 200 * x, 290 + 150, 125 + 200 * x, 320 + 150);
+            console.log();
+            (function (x) {
+                dsvg.drawImg("img/z_fz.svg", 101 + 200 * x, 320 + 150, "", () => {
+                    layer.open({
+                        title: pdxList[x].pdfmc,
+                        type: 2,
+                        content: '/ltvs_management/modules/mdlev/pdxInfo.html?pdfmc=' + encodeURI(pdxList[x].pdfmc) + "&pdfbh=" + pdxList[x].pdfbh,
+                        area: [OPEN_WIDTH * 0.95 + "px", OPEN_HEIGHT * 0.95 + "px"],
+                        maxmin: true
+                    });
+                }, "click");
+            })(x);
+            dsvg.drawText(101 + 200 * x, 370 + 150, pdxList[i].pdfmc);
+        }
+    }
+}
+class DataUtil {
+    constructor() { }
+    //获得台区id
+    getTqInfo() {
+        //暂时写成已知的数据，后面要从gis图中跳转过来
+        var id = "tq001";
+        if (id == "" || id == null) {
+            //警告 台区id 为空
+            return;
+        }
+        return id;
+    }
+    queryData(url, parm) {
+        var nodeList = null;
+        $.ajax({
+            url: url,
+            data: parm,
+            async: false,
+            error: function () {
+                console.log('查询信息失败');
+            }
+        }).done(function (res) {
+            nodeList = eval('(' + res + ')');
+        });
+        return nodeList;
+    }
+}
+//初始化
+function init() {
+    //标题
+    _SVG.text("武汉大学工学部网球场" + "_拓扑图").attr({
+        "font-weight": "bold",
+        "font-family": "Helvetica, Arial, sans-serif",
+        "font-size": 16
+    }).move(20, 20);
+
+
+}
+
+$(document).ready(function () {
+    var dataUtil = new DataUtil();
+    var dsvg = new Dsvg();
+    
+    //主线
+    dsvg.drawLine(100, 450, 1750, 450);
+    var frist_point_x = 250;
+    var frist_interval = 300;
+    var fristList = dataUtil.queryData("/ltvs_management/getPdfById", { "tqid": "tq001" });
+    var Adjustment_x = 200;
+    for (var i = 0; i < fristList.length; i++) {
+        if (i % 2 == 0) {
+            //计算第二层节点长度
+            var _pdfbh = fristList[i].pdfbh;
+            var _secondList_ = dataUtil.queryData("/ltvs_management/getPdxById", { "pdfId": _pdfbh });
+            var _secondList = [];
+            for(var t = 0;t < _secondList_.length;t++){
+                if(_secondList_[t].lev != "2")
+                _secondList.push(_secondList_[t]);
+            }
+            //1朝上
+            dsvg.drawLine(frist_point_x + frist_interval * i + Adjustment_x, 450, frist_point_x + frist_interval * i + Adjustment_x, 450- 65*_secondList.length-30);
+            //加上顶点 与 文字
+            _SVG.use(circle).move(frist_point_x + frist_interval * i + Adjustment_x-5,450- 65*_secondList.length-40);
+            dsvg.drawText(frist_point_x + frist_interval * i + Adjustment_x+10,450- 65*_secondList.length-40,fristList[i].pdfmc);
+            var pdfbh = fristList[i].pdfbh;
+            var secondList_ = dataUtil.queryData("/ltvs_management/getPdxById", { "pdfId": pdfbh });
+            var secondList = [];
+            for(var t = 0;t < secondList_.length;t++){
+                if(secondList_[t].lev != "2")
+                secondList.push(secondList_[t]);
+            }
+            var second_point_x = frist_point_x + frist_interval * i;
+            var second_point_y = 420-17;
+            var second_interval = 70;
+            for (var j = 0; j < secondList.length; j++) {
+                if (j % 2 == 0) {
+                    //第2层节点的长度
+                    var _pdxbh = secondList[j].pdxbh;
+                    var _thridList_ = dataUtil.queryData("/ltvs_management/getDbById", { "dbxId": _pdxbh });
+                    var _thridList = [];
+                    for(var t = 0; t < _thridList_.length;t++){
+                        if(_thridList_[t].xwdm != "4"){
+                            _thridList.push(_thridList_[t]);
+                        }
+                    }
+                    var _length = 0;
+                    if(_thridList.length == 0){
+                        _length = 100;
+                    }else{
+                        _length = _thridList.length * 5.7;
+                    }
+                    //2朝右
+                    dsvg.drawLine(second_point_x + Adjustment_x, second_point_y - second_interval * j, second_point_x + _length + Adjustment_x, second_point_y - second_interval * j);
+                    _SVG.use(circle).move(second_point_x + _length + Adjustment_x+3, second_point_y - second_interval * j-5);
+                    dsvg.drawText(second_point_x + _length + Adjustment_x+3, second_point_y - second_interval * j+5,secondList[j].pdxmc);
+                    var pdxbh = secondList[j].pdxbh;
+                    var thrid_point_x = second_point_x + 10;
+                    var thrid_point_y = second_point_y - second_interval * j;
+                    var thrid_interval = 5.5;
+                    var thridList_ = dataUtil.queryData("/ltvs_management/getDbById", { "dbxId": pdxbh });
+                    var thridList = [];
+                    for(var t = 0; t < thridList_.length;t++){
+                        if(thridList_[t].xwdm != "4"){
+                            thridList.push(thridList_[t]);
+                        }
+                    }
+                    for(var k = 0;k < thridList.length;k++){
+                        if(k % 2 == 0){
+                            //3朝下
+                            dsvg.drawLine(thrid_point_x + thrid_interval * k + Adjustment_x,thrid_point_y,thrid_point_x + thrid_interval * k + Adjustment_x,thrid_point_y+30);
+                            _SVG.use(circle2).move(thrid_point_x + thrid_interval * k + Adjustment_x-1,thrid_point_y+30);
+                        }else{
+                            //3朝上
+                            dsvg.drawLine(thrid_point_x + thrid_interval * k + Adjustment_x,thrid_point_y,thrid_point_x + thrid_interval * k + Adjustment_x,thrid_point_y-30);
+                            _SVG.use(circle2).move(thrid_point_x + thrid_interval * k + Adjustment_x-1,thrid_point_y-30);
+                        }
+                    }
+
+                } else {
+                    //第2层节点的长度
+                    var _pdxbh = secondList[j].pdxbh;
+                    var _thridList_ = dataUtil.queryData("/ltvs_management/getDbById", { "dbxId": _pdxbh });
+                    var _thridList = [];
+                    for(var t = 0; t < _thridList_.length;t++){
+                        if(_thridList_[t].xwdm != "4"){
+                            _thridList.push(_thridList_[t]);
+                        }
+                    }
+                    var _length = 0;
+                    if(_thridList.length == 0){
+                        _length = 100;
+                    }else{
+                        _length = _thridList.length * 5.7;
+                    }
+                    //2朝左
+                    dsvg.drawLine(second_point_x + Adjustment_x, second_point_y - second_interval * j, second_point_x - _length + Adjustment_x, second_point_y - second_interval * j);
+                    _SVG.use(circle).move(second_point_x - _length + Adjustment_x-10, second_point_y - second_interval * j-5);
+                    dsvg.drawText(second_point_x - _length + Adjustment_x-10-92, second_point_y - second_interval * j-25,secondList[j].pdxmc);
+                    var pdxbh = secondList[j].pdxbh;
+                    var thrid_point_x = second_point_x - 10;
+                    var thrid_point_y = second_point_y - second_interval * j;
+                    var thrid_interval = 5.5;
+                    var thridList_ = dataUtil.queryData("/ltvs_management/getDbById", { "dbxId": pdxbh });
+                    var thridList = [];
+                    for(var t = 0; t < thridList_.length;t++){
+                        if(thridList_[t].xwdm != "4"){
+                            thridList.push(thridList_[t]);
+                        }
+                    }
+                    for(var k = 0;k < thridList.length;k++){
+                        if(k % 2 == 0){
+                            //3朝下
+                            dsvg.drawLine(thrid_point_x - thrid_interval * k + Adjustment_x,thrid_point_y,thrid_point_x - thrid_interval * k + Adjustment_x,thrid_point_y+30);
+                            _SVG.use(circle2).move(thrid_point_x - thrid_interval * k + Adjustment_x-1,thrid_point_y+30);
+                        }else{
+                            //3朝上
+                            dsvg.drawLine(thrid_point_x - thrid_interval * k + Adjustment_x,thrid_point_y,thrid_point_x - thrid_interval * k + Adjustment_x,thrid_point_y-30);
+                            _SVG.use(circle2).move(thrid_point_x - thrid_interval * k + Adjustment_x-1,thrid_point_y-30);
+                        }
+                    }
+                }
+            }
+        } else {
+            //计算第二层节点长度
+            var _pdfbh = fristList[i].pdfbh;
+            var _secondList_ = dataUtil.queryData("/ltvs_management/getPdxById", { "pdfId": _pdfbh });
+            var _secondList = [];
+            for(var t = 0;t < _secondList_.length;t++){
+                if(_secondList_[t].lev != "2")
+                _secondList.push(_secondList_[t]);
+            }
+            //1朝下
+            dsvg.drawLine(frist_point_x + frist_interval * i + Adjustment_x, 450, frist_point_x + frist_interval * i + Adjustment_x, 450+ 65*_secondList.length+30);
+            //顶点加上节点 与 文字
+            _SVG.use(circle).move(frist_point_x + frist_interval * i + Adjustment_x-5,450+ 65*_secondList.length+30);
+            dsvg.drawText(frist_point_x + frist_interval * i + Adjustment_x+10,450+ 65*_secondList.length+30,fristList[i].pdfmc);
+            var pdfbh = fristList[i].pdfbh;
+            var secondList_ = dataUtil.queryData("/ltvs_management/getPdxById", { "pdfId": pdfbh });
+            var secondList = [];
+            for(var t = 0;t < secondList_.length;t++){
+                if(secondList_[t].lev != "2")
+                secondList.push(secondList_[t]);
+            }
+            var second_point_x = frist_point_x + frist_interval * i;
+            var second_point_y = 480+17;
+            var second_interval = 70;
+            for (var j = 0; j < secondList.length; j++) {
+                if (j % 2 == 0) {
+                    //2朝右
+                    dsvg.drawLine(second_point_x + Adjustment_x, second_point_y + second_interval * j, second_point_x + 350 + Adjustment_x, second_point_y + second_interval * j);
+                    _SVG.use(circle).move(second_point_x + 350 + Adjustment_x+3,second_point_y + second_interval * j-5);
+                    dsvg.drawText(second_point_x + 350 + Adjustment_x+3,second_point_y + second_interval * j+5,secondList[j].pdxmc);
+                    var pdxbh = secondList[j].pdxbh;
+                    var thrid_point_x = second_point_x + 10;
+                    var thrid_point_y = second_point_y + second_interval * j;
+                    var thrid_interval = 5.5;
+                    var thridList_ = dataUtil.queryData("/ltvs_management/getDbById", { "dbxId": pdxbh });
+                    var thridList = [];
+                    for(var t = 0; t < thridList_.length;t++){
+                        if(thridList_[t].xwdm != "4"){
+                            thridList.push(thridList_[t]);
+                        }
+                    }
+                    for(var k = 0;k < thridList.length;k++){
+                        if(k % 2 == 0){
+                            //3朝下
+                            dsvg.drawLine(thrid_point_x + thrid_interval * k + Adjustment_x,thrid_point_y,thrid_point_x + thrid_interval * k + Adjustment_x,thrid_point_y+30);
+                            _SVG.use(circle2).move(thrid_point_x + thrid_interval * k + Adjustment_x-1,thrid_point_y+30);
+                        }else{
+                            //3朝上
+                            dsvg.drawLine(thrid_point_x + thrid_interval * k + Adjustment_x,thrid_point_y,thrid_point_x + thrid_interval * k + Adjustment_x,thrid_point_y-30);
+                            _SVG.use(circle2).move(thrid_point_x + thrid_interval * k + Adjustment_x-1,thrid_point_y-30);
+                        }
+                    }
+                } else {
+                    //2朝左
+                    dsvg.drawLine(second_point_x + Adjustment_x, second_point_y + second_interval * j, second_point_x - 350 + Adjustment_x, second_point_y + second_interval * j);
+                    _SVG.use(circle).move(second_point_x - 350 + Adjustment_x-10, second_point_y + second_interval * j-5);
+                    dsvg.drawText(second_point_x - 350 + Adjustment_x-10-92, second_point_y + second_interval * j-25,secondList[j].pdxmc);
+                    var pdxbh = secondList[j].pdxbh;
+                    var thrid_point_x = second_point_x - 10;
+                    var thrid_point_y = second_point_y + second_interval * j;
+                    var thrid_interval = 5.5;
+                    var thridList_ = dataUtil.queryData("/ltvs_management/getDbById", { "dbxId": pdxbh });
+                    var thridList = [];
+                    for(var t = 0; t < thridList_.length;t++){
+                        if(thridList_[t].xwdm != "4"){
+                            thridList.push(thridList_[t]);
+                        }
+                    }
+                    for(var k = 0;k < thridList.length;k++){
+                        if(k % 2 == 0){
+                            //3朝下
+                            dsvg.drawLine(thrid_point_x - thrid_interval * k + Adjustment_x,thrid_point_y,thrid_point_x - thrid_interval * k + Adjustment_x,thrid_point_y+30);
+                            _SVG.use(circle2).move(thrid_point_x - thrid_interval * k + Adjustment_x-1,thrid_point_y+30);
+                        }else{
+                            //3朝上
+                            dsvg.drawLine(thrid_point_x - thrid_interval * k + Adjustment_x,thrid_point_y,thrid_point_x - thrid_interval * k + Adjustment_x,thrid_point_y-30);
+                            _SVG.use(circle2).move(thrid_point_x - thrid_interval * k + Adjustment_x-1,thrid_point_y-30);
+                        }
+                    }
+                }
+            }
+        }
+    }
+});
+

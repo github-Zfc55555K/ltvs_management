@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+	<link rel="stylesheet" href="../../css/layui.css">
+	<script type="text/javascript" src="../../js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="../../js/layui.js"></script>
+	<style type="text/css">
+		html,
+		body {
+			width: 100%;
+			height: 98%;
+		}
+
+		#jsmind_container {
+			width: 100%;
+			height: 86%;
+			border: solid 1px #ccc;
+			/*background:#f4f4f4;*/
+			background: #ccc;
+		}
+	</style>
+</head>
+
+<body>
+	<span class="layui-btn-group" style="float: right">
+		<button class="layui-btn layui-btn-sm" onclick="backForward(true)">
+			<i class="layui-icon">&#xe603;</i>
+		</button>
+		<button class="layui-btn layui-btn-sm" onclick="backForward(false)">
+			<i class="layui-icon">&#xe602;</i>
+		</button>
+	</span>
+	<div id="jsmind_nav">
+		<button id="zoom-in-button" style="width: 50px" onclick="zoomIn()">
+			大</button>
+		<button id="zoom-out-button" style="width: 50px" onclick="zoomOut()">
+			小</button>
+		<button class="sub" onclick="collapse_all();">关闭所有</button>
+	</div>
+	<div id="jsmind_container"></div>
+</body>
+<script type="text/javascript">
+	function backForward(flag) {
+		if (flag) {
+			history.back();
+		} else {
+			history.forward();
+		}
+	}
+	function getQueryString(name) { 
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); 
+        var r = window.location.search.substr(1).match(reg); 
+        if (r != null) return unescape(r[2]); 
+        return null; 
+    } 
+
+	function load_jsmind() {
+		var aaa = {};
+		var id = getQueryString("id");
+		$.ajax({
+			type: "POST",
+			url: "/ltvs_management/TransformerInfo/findById",
+			data: {
+				id: id
+			},
+			async: false,
+			dataType: "json",
+			success: function (data) {
+				aaa = data;
+			}
+		});
+
+		var mind = {
+			/* 元数据，定义思维导图的名称、作者、版本等信息 */
+			"meta": {
+				"name": "example",
+				"author": "hizzgdev@163.com",
+				"version": "0.2"
+			},
+			/* 数据格式声明 */
+			"format": "node_array",
+			/* 数据内容 */
+			"data": aaa
+		};
+		var options = {
+			container: 'jsmind_container',
+			editable: false,
+			theme: 'info',
+			view: {
+				hmargin: 100, // 思维导图距容器外框的最小水平距离
+				vmargin: 50, // 思维导图距容器外框的最小垂直距离
+				line_width: 2, // 思维导图线条的粗细
+				line_color: '#555' // 思维导图线条的颜色
+			},
+			layout: {
+				hspace: 10, // 节点之间的水平间距
+				vspace: 5, // 节点之间的垂直间距
+				pspace: 8
+				// 节点与连接线之间的水平间距（用于容纳节点收缩/展开控制器）
+			}
+		}
+		var jm = jsMind.show(options, mind);
+		// jm.set_readonly(true);
+		// var mind_data = jm.get_data();
+		// alert(mind_data);
+		jm.add_node("sub2", "sub23", "new node", {
+			"background-color": "red"
+		});
+		// jm.set_node_color('sub21', 'green', '#ccc');
+	}
+
+	var zoomInButton = document.getElementById("zoom-in-button");
+	var zoomOutButton = document.getElementById("zoom-out-button");
+	function zoomIn() {
+		var jm = jsMind.current;
+		if (jm.view.zoomIn()) {
+			zoomOutButton.disabled = false;
+		} else {
+			zoomInButton.disabled = true;
+		}
+		;
+	};
+
+	function zoomOut() {
+		var jm = jsMind.current;
+		if (jm.view.zoomOut()) {
+			zoomInButton.disabled = false;
+		} else {
+			zoomOutButton.disabled = true;
+		}
+		;
+	};
+	function collapse_all() {
+		var jm = jsMind.current;
+		jm.collapse_all();
+	}
+
+
+	load_jsmind();
+</script>
+
+</html>

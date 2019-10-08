@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ltvs.mapping.ISysteMapper">
+
+	<resultMap type="com.ltvs.pojo.LtvsQuartz" id="qMap">
+		<id property="qtid" column="qt_id" />
+		<result property="qtname" column="qt_name" />
+		<result property="qtclass" column="qt_class" />
+		<result property="qttime" column="qt_time" />
+		<result property="qtstatus" column="qt_status" />
+		<result property="qtcron" column="qt_scron" />
+		<result property="qtinfo" column="qt_info" />
+	</resultMap>
+
+	<select id="getAllQuartzInfo" resultMap="qMap">
+		SELECT
+		a.qt_id,
+		a.qt_name,
+		a.qt_class,
+		a.qt_time,
+		a.qt_status,
+		a.qt_cron,
+		a.qt_info
+		FROM
+		ltvs_quartz a
+	</select>
+</mapper>

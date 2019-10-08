@@ -1,0 +1,55 @@
+package com.ltvs.quartz.service;
+
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.quartz.CronScheduleBuilder;
+import org.quartz.CronTrigger;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.TriggerBuilder;
+import org.quartz.impl.StdSchedulerFactory;
+import org.springframework.stereotype.Service;
+
+@Service
+public class QuartzService {
+
+	public StdSchedulerFactory getSchedulerFactory(){
+		StdSchedulerFactory factory = new StdSchedulerFactory();
+		return factory;
+	}
+
+	public void addJob(HttpServletRequest req) throws SchedulerException {
+//		HttpSession session = req.getSession();
+//		StringBuilder consoleInfo = (StringBuilder) session.getAttribute("CONSOLE_INFO");
+//		consoleInfo.append("执行：添加任务/nokok");
+//		session.setAttribute("CONSOLE_INFO", consoleInfo);
+		System.out.println("添加任务");
+		Scheduler scheduler = getSchedulerFactory().getScheduler();
+		JobDetail jobDetail = JobBuilder.newJob(com.ltvs.quartz.job.QuartzJob.class).withIdentity("jobSf").build();
+		CronTrigger crTrigger = TriggerBuilder.newTrigger().withIdentity("cronSf")
+				.withSchedule(CronScheduleBuilder.cronSchedule("0/5 * * * * ? ")).build();
+		scheduler.scheduleJob(jobDetail, crTrigger);
+	}
+
+	public void pauseJob(HttpServletRequest req) throws SchedulerException {
+		System.out.println("暂停任务");
+		Scheduler scheduler = getSchedulerFactory().getScheduler();
+		scheduler.pauseJob(JobKey.jobKey("jobSf"));
+	}
+
+	public void startScheduler(HttpServletRequest req) throws SchedulerException {
+		System.out.println("开始任务");
+		Scheduler scheduler = getSchedulerFactory().getScheduler();
+		scheduler.start();
+	}
+	public void resumeJob(String jobName,HttpServletRequest req) throws SchedulerException{
+		System.out.println("恢复任务");
+		Scheduler scheduler = getSchedulerFactory().getScheduler();
+		scheduler.resumeJob(JobKey.jobKey(jobName));
+	}
+}

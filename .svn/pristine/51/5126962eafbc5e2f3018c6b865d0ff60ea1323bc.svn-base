@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>表单</title>
+    <link rel="stylesheet" href="../../css/layui.css">
+    <link rel="stylesheet" href="css/map.css">
+    <script type="text/javascript" src="../../js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../js/layui.js"></script>
+</head>
+
+<body>
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="width:90px">线路编号</label>
+        <div class="layui-input-inline">
+            <input type="text" id="bh" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input"
+                style="width:250px">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" onclick="save()">立即提交</button>
+        </div>
+    </div>
+    <script>
+        function save() {
+            var index = parent.layer.getFrameIndex(window.name);
+            var path = getQueryString('path');
+            var zoom = getQueryString('zoom');
+            if (zoom < 16) {
+                zoom = 1;
+            } else if (16 <= zomm && zoom < 18) {
+                zoom = 2;
+            } else if (18 <= zoom && zoom < 19) {
+                zoom = 3;
+            } else if (zoom >= 19) {
+                zoom = 4;
+            }
+            var bh = $('#bh').val().trim();
+            if(bh == null || bh == ""){
+                parent.layer.msg('编号不能为空', { shade: 0.3 });
+                return;
+            }
+            //后台验证编号是否存在
+            $.ajax({
+                url: '/ltvs_management/validateLine',
+                data: {
+                    bh: bh
+                },
+                success: function (result) {
+                    if (result.replace(/\"/g, "") == 'ok') {
+                        //不存在该编号
+                        $.ajax({
+                            url: '/ltvs_management/saveLine',
+                            data: {
+                                bh: bh,
+                                zoom, zoom,
+                                path: path
+                            },
+                            success: function (res) {
+                                if(res.replace(/\"/g, "") == 'ok'){
+                                    parent.layer.msg('保存成功', { shade: 0.3 });
+                                    parent.layer.close(index);
+                                }else{
+                                    parent.layer.msg('保存失败', { shade: 0.3 });
+                                    parent.layer.close(index);
+                                }
+                            },
+                            error: function () {
+                                console.log('error 保存折线信息错误');
+                            }
+                        });
+
+                    } else {
+                        //存在 
+                        parent.layer.msg('编号已存在', { shade: 0.3 });
+                        return;
+                    }
+                },
+                error: function () {
+                    console.log('error 保存折线信息错误');
+                }
+            });
+        }
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]);
+            return null;
+        } 
+    </script>
+</body>
+</html>

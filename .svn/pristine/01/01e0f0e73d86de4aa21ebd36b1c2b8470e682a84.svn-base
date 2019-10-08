@@ -1,0 +1,250 @@
+package com.ltvs.controller;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSONObject;
+import com.ltvs.pojo.CommunityInfo;
+import com.ltvs.pojo.ElectricityConsumer;
+import com.ltvs.pojo.JunctionBox;
+import com.ltvs.pojo.LineSegment;
+import com.ltvs.pojo.LtvsTransformerInfo;
+import com.ltvs.pojo.TaiwanInfo;
+import com.ltvs.pojo.TreeData;
+import com.ltvs.pojo.Trees;
+import com.ltvs.service.ITransformerInfoService;
+
+/**
+ * 系统模块
+ * 
+ * @Description
+ * @author LIU
+ * @date 2019年4月11日 上午8:57:58
+ */
+@Controller
+public class TransformerInfoController {
+
+
+    @Resource
+    private ITransformerInfoService transformerInfoService;
+
+    /**
+     * 展示数据
+     * 
+     * @Description
+     * @author LIU
+     * @param request
+     * @param response
+     * @throws UnsupportedEncodingException
+     */
+    @ResponseBody
+    @RequestMapping(value = "showData", method = RequestMethod.POST)
+    public void showData(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
+        response.setCharacterEncoding("UTF-8");
+        // 获得点击的数据名称
+        String id = (String) request.getParameter("id");
+        // 根据id查找台区名称
+        String name = transformerInfoService.findNameByIdTq(id);
+        List<TreeData> TreeDatas = new ArrayList<TreeData>();
+        List<CommunityInfo> findAllCommunityInfoByTqId = transformerInfoService.findAllCommunityInfoByTqId(id);
+        TreeData tt = new TreeData();
+        tt.setColumn("0");
+        tt.setId(id);
+        tt.setName(name);
+        tt.setColor("#87CEFA");
+        tt.setImage("/ltvs_management/modules/mdlev/xiaoqu.png");
+        TreeDatas.add(tt);
+        for (CommunityInfo communityInfo : findAllCommunityInfoByTqId) {
+            TreeData tt1 = new TreeData();
+            tt1.setColumn("1");
+            tt1.setId(communityInfo.getXqbs());
+            tt1.setName(communityInfo.getXqmc());
+            tt1.setColor("#87CEFA");
+            tt1.setImage("/ltvs_management/modules/mdlev/xiaoqu.png");
+            TreeDatas.add(tt);
+        }
+        try {
+            response.getWriter().write(JSONObject.toJSONString(TreeDatas));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "detailedInformation", method = RequestMethod.POST)
+    public void detailedInformation(HttpServletRequest request, HttpServletResponse response) {
+        response.setCharacterEncoding("UTF-8");
+        // 获得传来的数据
+        String name = (String) request.getParameter("name");
+        String id = (String) request.getParameter("id");
+        List<TreeData> TreeDatas = new ArrayList<TreeData>();
+        List<ElectricityConsumer> findElectricityConsumer = transformerInfoService.findElectricityConsumer(id, name);
+        Integer count = 0;
+        Integer coluunm = 1;
+        TreeData tt = new TreeData();
+        tt.setColumn("0");
+        tt.setId(id);
+        tt.setName(name + "栋");
+        tt.setColor("#87CEFA");
+        tt.setImage("/ltvs_management/modules/mdlev/lou.png");
+        TreeDatas.add(tt);
+        for (ElectricityConsumer electricityConsumer : findElectricityConsumer) {
+            if (electricityConsumer != null) {
+                TreeData td = new TreeData();
+                // 根据相的不同更改成不同的颜色
+                if (electricityConsumer.getThreeCircuits() == 1) {
+                    td.setColor("red");
+                }
+                if (electricityConsumer.getThreeCircuits() == 2) {
+                    td.setColor("green");
+                }
+                if (electricityConsumer.getThreeCircuits() == 3) {
+                    td.setColor("blue");
+                }
+                td.setId(electricityConsumer.getYhbh());
+                td.setName("用户编号:" + electricityConsumer.getYhbh() + "<br/>用户名称:" + electricityConsumer.getYhmc()
+                        + "<br/>用户地址:" + electricityConsumer.getYddz());
+                td.setImage("/ltvs_management/modules/mdlev/meng.png");
+                // 可以排多少行
+                if (count < 5) {
+                    td.setColumn(coluunm.toString());
+                    count++;
+                } else {
+                    count = 0;
+                    coluunm += 1;
+                    td.setColumn(coluunm.toString());
+                }
+                TreeDatas.add(td);
+            }
+        }
+        try {
+            response.getWriter().write(JSONObject.toJSONString(TreeDatas));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 获得地图上的一级点
+     * 
+     * @Description
+     * @author LIU
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "getTransformerInfo", method = RequestMethod.GET)
+    public List<LtvsTransformerInfo> getAlltsInfo() {
+        return this.transformerInfoService.getAllTransformer();
+    }
+    
+    @ResponseBody
+    @RequestMapping(value = "test", method = RequestMethod.POST)
+    public void test(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Trees t = new Trees();
+        List<TreeData> tds = new ArrayList<>();
+        for (int i = 0; i < 30; i++) {
+            TreeData td = new TreeData();
+            td.setColor("red");
+            tds.add(td);
+        }
+        for (int i = 0; i < 20; i++) {
+            TreeData td1 = new TreeData();
+            td1.setColor("blue");
+            tds.add(td1);
+        }
+        for (int i = 0; i < 20; i++) {
+            TreeData td1 = new TreeData();
+            td1.setColor("yellow");
+            tds.add(td1);
+        }
+        t.setTreeDatas(tds);
+        t.setGreenCount(20);
+        t.setYellowCount(20);
+        t.setRedCount(30);
+        response.getWriter().write(JSONObject.toJSONString(t));
+    }
+
+    /**
+     * 获得所有分接箱信息
+     * 
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "getjboxinfo", method = RequestMethod.GET)
+    public List<JunctionBox> getAllJunctionBox() {
+        return this.transformerInfoService.getAllJunctionBox();
+    }
+
+    /**
+     * 验证该折线编号是否存在
+     * 
+     * @param bh
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "validateLine", method = RequestMethod.GET)
+    public String validataLineExist(String bh) {
+        if (transformerInfoService.validateLine(bh) > 0) {
+            return "exist";
+        }
+        return "ok";
+    }
+
+    /**
+     * 验证该折线编号是否存在
+     * 
+     * @param bh
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "saveLine", method = RequestMethod.GET)
+    public String saveLinePath(String bh, String zoom, String path) {
+        int _zoom = Integer.parseInt(zoom);
+        if (transformerInfoService.saveLine(bh, _zoom, path) > 0) {
+            return "ok";
+        } else {
+            return "error";
+        }
+    }
+
+    /**
+     * 根据层级获得线路信息
+     */
+    @ResponseBody
+    @RequestMapping(value = "getLineByLev", method = RequestMethod.GET)
+    public List<LineSegment> getIineInfoByLev(String lev) {
+        Integer l = Integer.parseInt(lev);
+        return transformerInfoService.getLineByLev(l);
+    }
+
+    /**
+     * 获取所有台区信息
+     * 
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "gettqinfo", method = RequestMethod.GET)
+    public List<TaiwanInfo> getAllTqInfo() {
+        return transformerInfoService.getAllTqInfo();
+    }
+
+    /**
+     * 获取所有小区信息
+     */
+    @ResponseBody
+    @RequestMapping(value = "getxqinfo", method = RequestMethod.GET)
+    public List<CommunityInfo> getXqInfo() {
+        return transformerInfoService.getAllXqInfo();
+    }
+}

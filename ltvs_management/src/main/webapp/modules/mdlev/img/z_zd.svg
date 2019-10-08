@@ -1,0 +1,17 @@
+<svg width="48" height="48" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+ <g>
+  <title>background</title>
+  <rect fill="#fff" id="canvas_background" height="50" width="50" y="-1" x="-1"/>
+  <g display="none" overflow="visible" y="0" x="0" height="100%" width="100%" id="canvasGrid">
+   <rect fill="url(#gridpattern)" stroke-width="0" y="0" x="0" height="100%" width="100%"/>
+  </g>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <text stroke="#000" transform="matrix(3.3122163936239213,0,0,0.4717876815249487,-10.158691787017467,25.585841620591452) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="12" id="svg_5" y="38.129677" x="3.687513" fill-opacity="null" stroke-opacity="null" stroke-width="0" fill="#000000"/>
+  <rect stroke="#000" id="svg_12" height="16.874988" width="47.624966" y="0.504704" x="0.187515" fill-opacity="null" stroke-opacity="null" stroke-width="1.5" fill="none"/>
+  <line stroke="#000" stroke-linecap="null" stroke-linejoin="null" id="svg_13" y2="48.25467" x2="24.125" y1="17.879693" x1="23.875" fill-opacity="null" stroke-opacity="null" stroke-width="1.5" fill="none"/>
+  <text stroke="#000" transform="matrix(0.6349223536778794,0,0,1.0082662440390653,-6.992128754293321,2.2589976076543703) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="12" id="svg_15" y="11.004697" x="12.812506" fill-opacity="null" stroke-opacity="null" stroke-width="0" fill="#000000">检测计量终端</text>
+ </g>
+</svg>

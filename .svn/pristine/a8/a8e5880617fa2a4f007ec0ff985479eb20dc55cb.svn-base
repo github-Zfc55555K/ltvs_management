@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="shortcut icon" href="./img/logo_nw.png" type="image/x-icon" />
+    <title>低压配电网拓扑分析系统</title>
+    <link rel="stylesheet" href="./css/layui.css">
+</head>
+
+<body class="layui-layout-body">
+    <div class="layui-layout layui-layout-admin">
+        <div class="layui-header">
+            <div class="layui-logo" style="width:230px">低压配电网拓扑辩识与分析系统</div>
+            <ul class="layui-nav layui-layout-left">
+                <li class="layui-nav-item"><a href="javascript:;" data-id="1" data-title="GIS视图" data-url="modules/mdmap/ltvsMap.html"
+                        class="site-demo-active" data-type="tabAdd">GIS视图</a></li>
+                        <li class="layui-nav-item"><a href="javascript:;" data-id="3" data-title="接线图" data-url="modules/mdtopo/topo.html"
+                            class="site-demo-active" data-type="tabAdd">接线图</a></li>
+                <li class="layui-nav-item"><a href="javascript:;" data-id="2" data-title="逻辑图" class="site-demo-active"
+                        data-type="tabAdd" data-url="demo.html">逻辑视图</a></li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">其它系统</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="">#1</a></dd>
+                        <dd><a href="">@1</a></dd>
+                        <dd><a href="">#3</a></dd>
+                    </dl>
+                </li>
+            </ul>
+            <ul class="layui-nav layui-layout-right">
+                <li class="layui-nav-item" id="userName">
+                    欢迎光临
+                </li>
+                <li class="layui-nav-item"><a href="loginOut">退出</a></li>
+            </ul>
+        </div>
+
+        <div class="layui-side layui-bg-black">
+            <div class="layui-side-scroll">
+                <!-- 左侧垂直导航区域-->
+                <ul class="layui-nav layui-nav-tree layui-nav-itemed" lay-filter="test">
+                    <li class="layui-nav-item layui-nav-itemed">
+                        <a class="" href="javascript:;">区域</a>
+                        <dl class="layui-nav-child">
+                            <dd class='layui-this'>
+                                <a href="javascript:void(0);" data-id="" data-title="">白云区</a>
+                            </dd>
+                            <dd>
+                                <a href="javascript:;" data-id="3" data-title="海珠区"
+                                    data-url="modules/mdmap/powerGrid.jsp" class=""
+                                    data-type="tabAdd">海珠区</a>
+                            </dd>
+                            <dd>
+                                <a href="javascript:;" data-id="4" data-title="番禺区"
+                                    data-url="modules/mdmap/powerGrid.jsp" class=""
+                                    data-type="tabAdd">番禺区</a>
+                            </dd>
+                            <dd>
+                                <a href="javascript:;" data-id="5" data-title="荔湾区"
+                                    data-url="modules/mdmap/powerGrid.jsp" class=""
+                                    data-type="tabAdd">荔湾区</a>
+                            </dd>
+                            <dd>
+                                <a href="javascript:;" data-id="6" data-title="天河区"
+                                    data-url="modules/mdmap/powerGrid.jsp" class=""
+                                    data-type="tabAdd">天河区</a>
+                            </dd>
+                            <dd>
+                                <a href="javascript:;" data-id="7" data-title="花都区"
+                                    data-url="modules/mdmap/powerGrid.jsp" class=""
+                                    data-type="tabAdd">花都区</a>
+                            </dd>
+                        </dl>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!--tab标签-->
+        <div class="layui-tab" lay-filter="demo" lay-allowclose="true" style="margin-left: 200px;">
+            <ul class="layui-tab-title"></ul>
+            <div class="layui-tab-content">
+            </div>
+        </div>
+
+        <div class="layui-footer" style="text-align:center;">
+            <!-- 底部固定区域 -->
+            CopyRight 2015-2020 武汉星创源科技有限公司 版权所有
+        </div>
+    </div>
+    <script src="./js/layui.js"></script>
+    <script src="js/index.js"></script>
+</body>
+
+</html>

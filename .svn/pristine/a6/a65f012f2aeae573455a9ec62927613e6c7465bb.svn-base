@@ -1,0 +1,125 @@
+/**
+ * 逻辑图
+ */
+/**
+ * 设置缩放
+ */
+window.onload = function () {
+    $solway.zoom({
+        ele: document.getElementById('container'),
+        scale: 1,
+        minScale: 0.1,
+        rate: 0.1
+    });
+    $solway.drag({
+        ele: document.getElementById('container')
+    });
+};
+var MAX_WIDTH = 1500;
+var MAX_HEIGHT = 900;
+//svg 根元素
+var _SVG = SVG('container').size(1400, 800);
+var circle = _SVG.defs().circle(10).attr({
+    'fill-opacity': 0,
+    'stroke': '#000',
+    'stroke-width': 1.5
+});
+// 虚线框
+var rect = _SVG.defs().rect(300, 200).attr({
+    'fill-opacity': 0,
+    'stroke': '#000',
+    'stroke-width': 1.5,
+    'stroke-dasharray': "5"
+});
+var Dsvg = function () { }
+//电站
+Dsvg.prototype.drawStation = function (x, y) {
+    var _x = parseInt(x);
+    var _y = parseInt(y);
+    var x2 = _x + 5;
+    var y2 = _y + 8;
+    var x3 = _x + 9;
+    var y3 = _y;
+    _SVG.use(circle).move(_x, _y);
+    _SVG.use(circle).move(x2, y2);
+    _SVG.use(circle).move(x3, y3);
+}
+
+Dsvg.prototype.drawLine = function (start1, end1, start2, end2) {
+    _SVG.line(start1, end1, start2, end2).attr({
+        'fill-opacity': 0,
+        'stroke': '#000',
+        'stroke-width': 1.5
+    });
+};
+
+Dsvg.prototype.drawLineWithColor = function (start1, end1, start2, end2, color) {
+    _SVG.line(start1, end1, start2, end2).attr({
+        'fill-opacity': 0,
+        'stroke': color,
+        'stroke-width': 1.5
+    });
+};
+
+Dsvg.prototype.drawImg = function (path, x, y, text) {
+    var img = _SVG.image(path).loaded(function (loader) {
+        this.size(loader.width, loader.height);
+        (function () {
+            _SVG.text(text).attr({
+                "font-weight": "normal",
+                "font-family": "Helvetica, Arial, sans-serif",
+                "font-size": 12
+            }).move(x, y + loader.height - 8);
+        })();
+    }).move(x, y);
+
+}
+var getQueryString = function (name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return unescape(r[2]);
+    return null;
+}
+//初始化
+function init() {
+    //标题
+    _SVG.text("台区_逻辑图").attr({
+        "font-weight": "bold",
+        "font-family": "Helvetica, Arial, sans-serif",
+        "font-size": 16
+    }).move(20, 20);
+    _SVG.image("img/dx.png").move(60, 69);
+    //主干线路
+    var dsvg = new Dsvg();
+    dsvg.drawStation(100, 60);
+    dsvg.drawLine(50, 69, 180, 69);
+    dsvg.drawLine(205, 69, 1200, 69);
+    dsvg.drawLine(180, 69, 205, 55);
+}
+$(document).ready(function () {
+    init();
+    var dsvg = new Dsvg();
+    //配电房
+    _SVG.text("配电房").attr({
+        "font-weight": "normal",
+        "font-family": "Helvetica, Arial, sans-serif",
+        "font-size": 12
+    }).move(450, 100);
+
+    _SVG.use(rect).move(190, 90);
+    dsvg.drawStation(320, 152);
+    dsvg.drawLine(330, 69, 330, 265);
+
+    dsvg.drawLine(290, 116, 330, 116);
+    dsvg.drawImg("img/dianbiao.png", 270, 90, "高压电表");
+
+    dsvg.drawLine(330, 180, 370, 180);
+    dsvg.drawImg("img/jixianqi.png", 365, 165, "集线器");
+
+    dsvg.drawLine(290, 200, 330, 200);
+    dsvg.drawImg("img/zhongduan.png", 270, 185, "负控终端");
+
+    dsvg.drawLineWithColor(50, 375, 1200, 375, "#8B0000");
+    dsvg.drawLineWithColor(50, 400, 1200, 400, "#F0E68C");
+    dsvg.drawLineWithColor(50, 425, 1200, 425, "#90EE90");
+});

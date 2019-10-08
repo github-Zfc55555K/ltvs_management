@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>登陆</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=10"/>    
+    <link rel="stylesheet" href="css/layui.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/login.css">
+    <script src="js/layui.js"></script>
+    <script src="js/jquery-1.8.3.min.js"></script>
+    <script src="js/jquery-form.js"></script>
+    <script src="js/login.js"></script>
+</head>
+<body>
+<div class="login-container">
+	<header class="layui-row layui-col-space12">
+        <div class="layui-col-md6">
+            <span style="float:right">
+             <img class="login-head-image" src="img/logo_nw.png">
+            </span>
+        </div>
+        <div class="layui-col-md6">
+            <span style="float:left" >
+            <strong class="login-title">低压配电网拓扑辩识与分析系统</strong>
+            </span>
+	    </div>
+	</header>
+    <div class="login-content">
+        <div class="admin-login-background" style="border-width: 5px">
+            <form class="layui-form" action="ltvsLogin" method="post" id="loginForm">
+                <div>
+                    <i class="layui-icon layui-icon-username admin-icon admin-icon-username"></i>
+                    <input type="text" name="username" placeholder="请输入用户名" id="username"
+                       autocomplete="off"
+                       class="layui-input admin-input admin-input-username">
+                </div>
+           
+                <div>
+           		    <i class="layui-icon layui-icon-password admin-icon admin-icon-password"></i>
+                    <input type="password" name="password"
+                       placeholder="请输入密码"
+                       autocomplete="off"
+                       class="layui-input admin-input admin-input-password">
+                </div>
+                <button class="layui-btn admin-button" lay-submit lay-filter="formDemo" id="loginBtn">登陆</button>
+            </form>
+        </div>
+    </div>
+	<footer>
+        <strong>CopyRight 2015-2020 武汉星创源科技有限公司 版权所有</strong> 
+    </footer>
+</div>
+</body>
+</html>

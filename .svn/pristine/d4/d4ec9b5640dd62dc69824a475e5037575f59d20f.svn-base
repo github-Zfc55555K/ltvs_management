@@ -1,0 +1,45 @@
+package com.ltvs.pojo;
+
+import java.util.List;
+
+public class Trees {
+    private List<TreeData> treeDatas;
+
+    private Integer redCount;
+
+    private Integer greenCount;
+
+    private Integer yellowCount;
+
+    public List<TreeData> getTreeDatas() {
+        return treeDatas;
+    }
+
+    public void setTreeDatas(List<TreeData> treeDatas) {
+        this.treeDatas = treeDatas;
+    }
+
+    public Integer getRedCount() {
+        return redCount;
+    }
+
+    public void setRedCount(Integer redCount) {
+        this.redCount = redCount;
+    }
+
+    public Integer getGreenCount() {
+        return greenCount;
+    }
+
+    public void setGreenCount(Integer greenCount) {
+        this.greenCount = greenCount;
+    }
+
+    public Integer getYellowCount() {
+        return yellowCount;
+    }
+
+    public void setYellowCount(Integer yellowCount) {
+        this.yellowCount = yellowCount;
+    }
+}
